@@ -58,8 +58,8 @@ To compress a raster, you have to run the command:
  * [**Type 4**](src/k2raster/plain/k2-raster-plain-DAC.cpp): Stored the lastest \<plainLevels> using a DAC encode. 
  * [**Type 5**](src/k2raster/plain/k2-raster-plain-VByte.cpp): Stored the lastest \<plainLevels> using VByte encode.
  * [**Type 6**](src/k2raster/compresessLeaves/k2-raster-CompressLeaves.cpp): Creates a vocabulary to represent all submatrices defined by \<plainLevels>
- * [**Type 7**](src/k2raster/compresessLeaves/k2-raster-CompressLeavesH.cpp): Creates a vocabulary to represent all sumbatrices defined by \<plainLevels> than have a frequency greater than \<minFreVoc>. The rest of submatrices are stores as plain values (array of interges of 32 bits) 
- * [**Type 8**](src/k2raster/k2-raster-opt.cpp): Optimization of **Type 2**. It executes the function *next()* instead of *access()* when we want to obtain a values from a DAC.
+ * [**Type 7**](src/k2raster/compresessLeaves/k2-raster-CompressLeavesH.cpp): Creates a vocabulary to represent all sumbatrices defined by \<plainLevels> than have a frequency greater than \<minFreVoc>. The rest of submatrices are stored as plain values (array of interges of 32 bits) 
+ * [**Type 8**](src/k2raster/k2-raster-opt.cpp): Optimization of **Type 2**. It executes the function *next()* instead of *access()* when we want to obtain a value from a DAC.
  * [**Type 9**](src/k2raster/k2-raster-entropy.cpp): It uses a heuristic function to decide if a submatrix is stored in the vocabulary or in plain. The heuristic function determines which of the two options uses less space.
  
  
@@ -102,8 +102,8 @@ For example, a 5x5 raster data (5 rows and 5 columns) is stored in _./inputData.
  Where:
  
  * **\<k2rasterFile>** Path of the file where the k<sup>2</sup>-raster is stored 
- * **\<queriesFile>**  File with a set of queries. Each line is a query with format "posX1 posX2 posY1 posY2 val1 val2" (val1 and val2 are not used on this version)
- * **\<check>** 1 to check if the final result is correct. 0 in other case.
+ * **\<queriesFile>**  File with a set of queries. Each line is a query with format "posX1 posX2 posY1 posY2 val1 val2" (val1 and val2 are not used in this version)
+ * **\<check>** 1 to check if the final result is correct. 0 in another case.
  
 
 #### Retrieving cells with a given value or range of values ####
@@ -117,7 +117,7 @@ Given a range of values, this query retrieves all raster positions whose value l
  
  * **\<k2rasterFile>** Path of the file where the k<sup>2</sup>-raster is stored 
  * **\<queriesFile>**  File with a set of queries. Each line is a query with format "posX1 posX2 posY1 posY2 val1 val2"
- * **\<check>** 1 to check if the final result is correct. 0 in other case.
+ * **\<check>** 1 to check if the final result is correct. 0 in another case.
 
 #### Checking the existence of a given value or range of values ####
 
@@ -130,7 +130,7 @@ Given a region and a range, this query checks if all cell values of the region a
  
  * **\<k2rasterFile>** Path of the file where the k<sup>2</sup>-raster is stored 
  * **\<queriesFile>**  File with a set of queries. Each line is a query with format "posX1 posX2 posY1 posY2 val1 val2"
- * **\<check>** 1 to check if the final result is correct. 0 in other case.
+ * **\<check>** 1 to check if the final result is correct. 0 in another case.
  * **\<allCells>** sets whether all cells or at least one must meet query conditions
 
 #### Spatial join - k<sup>2</sup>-raster  and R-tree ####
@@ -149,8 +149,8 @@ Given a region and a range, this query checks if all cell values of the region a
     * [**Type 0**](src/rtree/SpatialJoin/QueryStrategy/GetObjectsQueryStrategyQueue.cpp). Using a queue: Submatrices to be processed are added to a queue.
     * [**Type 1**](src/rtree/SpatialJoin/QueryStrategy/GetObjectsQueryStrategyTree.cpp). Using a tree: A tree is created where it stores by levels the submatrices to be processed.
     * [**Type 2**](src/rtree/SpatialJoin/QueryStrategy/GetObjectsQueryStrategyTree2.cpp). Using a tree V2: A tree is created where it stores by levels the submatrices to be processed (version 2).
-    * [**Type 3**](src/rtree/SpatialJoin/QueryStrategy/GetObjectsQueryStrategyLeaves.cpp). Using leaves: First, the leaves of the R-tree are obtained and afterwards their cells are searched in the k<sup>.
-    * [**Type 4**](src/joinRTree.cpp). Using cells: First the cells of the k2-raster are obtained and then they are searched in the R-tree if they match in a leaf.
+    * [**Type 3**](src/rtree/SpatialJoin/QueryStrategy/GetObjectsQueryStrategyLeaves.cpp). Using leaves: First, the leaves of the R-tree are obtained and afterward their cells are searched in the k<sup>2</sup>-raster.
+    * [**Type 4**](src/joinRTree.cpp). Using cells: First, the cells of the k2-raster are obtained and then they are searched in the R-tree if they match in a leaf.
 
 ## Publications ##
 
