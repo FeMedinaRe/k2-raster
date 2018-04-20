@@ -156,6 +156,8 @@ Given a region and a range, this query checks if all cell values of the region a
 
 Ladra, S., Paramá, J. R., & Silva-Coira, F. (2016). Compact and queryable representation of raster datasets. In Proceedings of the 28th International Conference on Scientific and Statistical Database Management - SSDBM ’16 (pp. 1–12). New York, New York, USA: ACM Press. http://doi.org/10.1145/2949689.2949710
 
+Ladra, S., Paramá, J. R., & Silva-Coira, F. (2017). Scalable and queryable compressed storage structure for raster data, Information System, 72 (2017). doi:10.1016/j.is.2017.10.007.
+
 ## Authors ##
 
 Susana Ladra - <susana.ladra@udc.es>     
