@@ -1,0 +1,1247 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+   <FileVersion major="1" minor="6" />
+   <Project>
+      <Option title="spatialindex" />
+      <Option makefile_is_custom="1" />
+      <Option compiler="gcc" />
+      <Option virtualFolders="CMake Files\;CMake Files\src\;CMake Files\test\;" />
+      <Build>
+      <Target title="all">
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 all" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="install">
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 install" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="install/local">
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 install/local" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="install/strip">
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 install/strip" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="list_install_components">
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 list_install_components" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="rebuild_cache">
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 rebuild_cache" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="spatialindex">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/libspatialindex.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 spatialindex" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="spatialindex/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/libspatialindex.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 spatialindex/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="spatialindex_c">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/libspatialindex_c.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 spatialindex_c" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="spatialindex_c/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/libspatialindex_c.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 spatialindex_c/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-geometry-Intersection">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-geometry-Intersection" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-geometry-Intersection" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-geometry-Intersection/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-geometry-Intersection" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-geometry-Intersection/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-mvrtree-Exhaustive">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-mvrtree-Exhaustive" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-mvrtree-Exhaustive" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-mvrtree-Exhaustive/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-mvrtree-Exhaustive" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-mvrtree-Exhaustive/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-mvrtree-Generator">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-mvrtree-Generator" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-mvrtree-Generator" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-mvrtree-Generator/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-mvrtree-Generator" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-mvrtree-Generator/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-mvrtree-MVRTreeLoad">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-mvrtree-MVRTreeLoad" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-mvrtree-MVRTreeLoad" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-mvrtree-MVRTreeLoad/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-mvrtree-MVRTreeLoad" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-mvrtree-MVRTreeLoad/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-mvrtree-MVRTreeQuery">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-mvrtree-MVRTreeQuery" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-mvrtree-MVRTreeQuery" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-mvrtree-MVRTreeQuery/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-mvrtree-MVRTreeQuery" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-mvrtree-MVRTreeQuery/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-rtree-Exhaustive">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-rtree-Exhaustive" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-rtree-Exhaustive" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-rtree-Exhaustive/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-rtree-Exhaustive" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-rtree-Exhaustive/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-rtree-Generator">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-rtree-Generator" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-rtree-Generator" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-rtree-Generator/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-rtree-Generator" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-rtree-Generator/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-rtree-RTreeBulkLoad">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-rtree-RTreeBulkLoad" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-rtree-RTreeBulkLoad" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-rtree-RTreeBulkLoad/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-rtree-RTreeBulkLoad" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-rtree-RTreeBulkLoad/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-rtree-RTreeLoad">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-rtree-RTreeLoad" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-rtree-RTreeLoad" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-rtree-RTreeLoad/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-rtree-RTreeLoad" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-rtree-RTreeLoad/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-rtree-RTreeQuery">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-rtree-RTreeQuery" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-rtree-RTreeQuery" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-rtree-RTreeQuery/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-rtree-RTreeQuery" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-rtree-RTreeQuery/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-tprtree-Exhaustive">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-tprtree-Exhaustive" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-tprtree-Exhaustive" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-tprtree-Exhaustive/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-tprtree-Exhaustive" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-tprtree-Exhaustive/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-tprtree-Generator">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-tprtree-Generator" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-tprtree-Generator" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-tprtree-Generator/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-tprtree-Generator" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-tprtree-Generator/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-tprtree-TPRTreeLoad">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-tprtree-TPRTreeLoad" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-tprtree-TPRTreeLoad" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-tprtree-TPRTreeLoad/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-tprtree-TPRTreeLoad" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-tprtree-TPRTreeLoad/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-tprtree-TPRTreeQuery">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-tprtree-TPRTreeQuery" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-tprtree-TPRTreeQuery" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="test-tprtree-TPRTreeQuery/fast">
+         <Option output="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin/test-tprtree-TPRTreeQuery" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/bin" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add option="-DHAVE_SRAND48=1" />
+            <Add option="-DHAVE_GETTIMEOFDAY=1" />
+            <Add option="-DHAVE_MEMSET=1" />
+            <Add option="-DHAVE_MEMCPY=1" />
+            <Add option="-DHAVE_BCOPY=1" />
+            <Add option="-DHAVE_PTHREAD_H=1" />
+            <Add directory="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/../include" />
+            <Add directory="/usr/include" />
+            <Add directory="/usr/include/c++/4.8" />
+            <Add directory="/usr/include/c++/4.8/backward" />
+            <Add directory="/usr/include/x86_64-linux-gnu" />
+            <Add directory="/usr/include/x86_64-linux-gnu/c++/4.8" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include" />
+            <Add directory="/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed" />
+            <Add directory="/usr/local/include" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 test-tprtree-TPRTreeQuery/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      </Build>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/capi/BoundsQuery.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/capi/CountVisitor.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/capi/CustomStorage.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/capi/DataStream.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/capi/Error.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/capi/IdVisitor.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/capi/Index.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/capi/LeafQuery.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/capi/ObjVisitor.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/capi/Utility.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/capi/sidx_api.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/mvrtree/Index.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/mvrtree/Leaf.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/mvrtree/MVRTree.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/mvrtree/Node.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/mvrtree/Statistics.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/rtree/BulkLoader.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/rtree/Index.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/rtree/Leaf.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/rtree/Node.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/rtree/RTree.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/rtree/Statistics.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/spatialindex/LineSegment.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/spatialindex/MovingPoint.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/spatialindex/MovingRegion.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/spatialindex/Point.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/spatialindex/Region.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/spatialindex/SpatialIndexImpl.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/spatialindex/TimePoint.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/spatialindex/TimeRegion.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/storagemanager/Buffer.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/storagemanager/DiskStorageManager.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/storagemanager/MemoryStorageManager.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/storagemanager/RandomEvictionsBuffer.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/tools/Tools.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/tprtree/Index.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/tprtree/Leaf.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/tprtree/Node.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/tprtree/Statistics.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/tprtree/TPRTree.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/geometry/Intersection.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/mvrtree/Exhaustive.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/mvrtree/Generator.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/mvrtree/MVRTreeLoad.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/mvrtree/MVRTreeQuery.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/rtree/Exhaustive.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/rtree/Generator.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/rtree/RTreeBulkLoad.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/rtree/RTreeLoad.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/rtree/RTreeQuery.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/tprtree/Exhaustive.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/tprtree/Generator.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/tprtree/RandomGenerator.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/tprtree/TPRTreeLoad.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/tprtree/TPRTreeQuery.cc">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/LineSegment.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/MVRTree.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/MovingPoint.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/Point.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/RTree.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/Region.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/SpatialIndex.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/TPRTree.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/TimePoint.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/TimeRegion.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/Version.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/capi/BoundsQuery.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/capi/CountVisitor.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/capi/CustomStorage.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/capi/DataStream.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/capi/Error.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/capi/IdVisitor.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/capi/Index.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/capi/LeafQuery.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/capi/ObjVisitor.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/capi/Utility.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/capi/sidx_api.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/capi/sidx_config.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/include/spatialindex/capi/sidx_impl.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/mvrtree/Index.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/mvrtree/Leaf.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/mvrtree/MVRTree.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/mvrtree/Node.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/mvrtree/PointerPoolNode.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/mvrtree/Statistics.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/rtree/BulkLoader.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/rtree/Index.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/rtree/Leaf.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/rtree/Node.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/rtree/PointerPoolNode.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/rtree/RTree.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/rtree/Statistics.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/storagemanager/Buffer.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/storagemanager/DiskStorageManager.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/storagemanager/MemoryStorageManager.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/storagemanager/RandomEvictionsBuffer.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/tprtree/Index.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/tprtree/Leaf.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/tprtree/Node.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/tprtree/PointerPoolNode.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/tprtree/Statistics.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/tprtree/TPRTree.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/tprtree/RandomGenerator.h">
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\" />
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/src/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\src\" />
+      </Unit>
+      <Unit filename="/home/fernando/Doutoramento/Software/RTree/spatialindex-src-1.8.5/test/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\test\" />
+      </Unit>
+   </Project>
+</CodeBlocks_project_file>

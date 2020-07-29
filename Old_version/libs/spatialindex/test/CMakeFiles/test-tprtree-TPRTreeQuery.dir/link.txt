@@ -1,0 +1,1 @@
+/usr/bin/c++    -pedantic -Wall -Wpointer-arith -Wcast-align -Wcast-qual  -Wredundant-decls -Wno-long-long -std=c++98 -ansi -O2 -g -DNDEBUG   CMakeFiles/test-tprtree-TPRTreeQuery.dir/tprtree/TPRTreeQuery.cc.o CMakeFiles/test-tprtree-TPRTreeQuery.dir/tprtree/RandomGenerator.cc.o  -o ../bin/test-tprtree-TPRTreeQuery -rdynamic ../bin/libspatialindex.a 
