@@ -1,0 +1,1 @@
+/usr/bin/c++    -pedantic -Wall -Wpointer-arith -Wcast-align -Wcast-qual  -Wredundant-decls -Wno-long-long -std=c++98 -ansi -O2 -g -DNDEBUG   CMakeFiles/test-rtree-RTreeBulkLoad.dir/rtree/RTreeBulkLoad.cc.o  -o ../bin/test-rtree-RTreeBulkLoad -rdynamic ../bin/libspatialindex.a 

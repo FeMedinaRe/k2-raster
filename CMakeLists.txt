@@ -1,183 +1,167 @@
-cmake_minimum_required(VERSION 2.8.4)
-project(k2-raster)
-set(PROJECT_VENDOR "Fernando Silva")
-set(CMAKE_PROJECT_NAME "k2-raster")
-set(PROJECT_CONTACT "fernando.silva@udc.es")
-set(CMAKE_INSTALL_PREFIX /home/fsilva/software)
-set(CMAKE_COMPILER_IS_GNUCXX)
+cmake_minimum_required(VERSION 2.8.7)
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
+include(AppendCompilerFlags)
 
+project(k2-raster_sdsl)
+set(PROJECT_VENDOR "Fernando Silva-Coira")
+set(CMAKE_PROJECT_NAME "k2-raster_sdsl")
+set(PROJECT_CONTACT "fernando.silva@udc.es")
+
+set(CMAKE_BUILD_TYPE "Debug")
 
 # Set output folder
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# C++11 compiler Check
+if(NOT CMAKE_CXX_COMPILER_VERSION) # work around for cmake versions smaller than 2.8.10
+    execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CMAKE_CXX_COMPILER_VERSION)
+endif()
+if(CMAKE_CXX_COMPILER MATCHES ".*clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_COMPILER_IS_CLANGXX 1)
+endif()
+if( (CMAKE_COMPILER_IS_GNUCXX AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.7) OR
+(CMAKE_COMPILER_IS_CLANGXX AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 3.2))
+    message(FATAL_ERROR "Your C++ compiler does not support C++11. Please install g++ 4.7 (or greater) or clang 3.2 (or greater)")
+else()
+    message(STATUS "Compiler is recent enough to support C++11.")
+endif()
+if( CMAKE_COMPILER_IS_GNUCXX )
+    append_cxx_compiler_flags("-std=c++11 -Wall -Wextra " "GCC" CMAKE_CXX_FLAGS)
+    append_cxx_compiler_flags("-msse4.2 -O3 -ffast-math -funroll-loops -fno-omit-frame-pointer -g" "GCC" CMAKE_CXX_FLAGS_RELEASE)
+else()
+    append_cxx_compiler_flags("-std=c++11" "CLANG" CMAKE_CXX_FLAGS)
+    append_cxx_compiler_flags("-stdlib=libc++" "CLANG" CMAKE_CXX_FLAGS)
+    append_cxx_compiler_flags("-msse4.2 -O3  -ffast-math -funroll-loops -DNDEBUG" "CLANG" CMAKE_CXX_FLAGS_RELEASE)
+endif()
+include(CheckSSE)
+FindSSE ()
+if( SSE4_2_FOUND )
+    if( CMAKE_COMPILER_IS_GNUCXX )
+        append_cxx_compiler_flags("-msse4.2" "GCC" CMAKE_CXX_FLAGS)
+    else()
+        append_cxx_compiler_flags("-msse4.2" "CLANG" CMAKE_CXX_FLAGS)
+    endif()
+    message(STATUS "CPU does support SSE4.2.")
+else()
+    message(STATUS "CPU does NOT support SSE4.2")
+endif()
 
-include_directories(./include/)
-include_directories(./libs/RePair/)
+add_subdirectory(external/sdsl-lite)
 
+include_directories("${PROJECT_SOURCE_DIR}/external/sdsl-lite/external/googletest/include"
+        ${CMAKE_HOME_DIRECTORY}/include
+        ${CMAKE_BINARY_DIR}/external/sdsl-lite/include
+        ${CMAKE_BINARY_DIR}/external/sdsl-lite/external/libdivsufsort/include/
+        ${CMAKE_HOME_DIRECTORY}//external/sdsl-lite/external/googletest/include
+        ${CMAKE_HOME_DIRECTORY}/external/sdsl-lite/external/FastPFor/headers/
+        ${STXXL_INCLUDE_DIRS}
+        )
+
+# Set source files
 set(SOURCES
-        src/k2raster/k2-raster.cpp
-        src/k2raster/plain/k2-raster-plain.cpp
-        src/k2raster/plain/k2-raster-plain-DAC.cpp
-        src/k2raster/plain/k2-raster-plain-VByte.cpp
-        src/k2raster/compresessLeaves/k2-raster-CompressLeaves.cpp
-        src/k2raster/compresessLeaves/k2-raster-CompressLeavesH.cpp
-        src/k2raster/k2-raster-entropy.cpp
-        src/k2raster/k2-raster-opt.cpp
-        src/rtree/GetObjectsQueryBasic.cpp
-        src/rtree/SpatialJoin/QueryStrategy/GetRoot.cpp
-        src/rtree/SpatialJoin/QueryStrategy/GetObjectsQueryStrategy.cpp
-        src/rtree/SpatialJoin/QueryStrategy/GetObjectsQueryStrategyLeaves.cpp
-        src/rtree/SpatialJoin/QueryStrategy/GetObjectsQueryStrategyQueue.cpp
-        src/rtree/SpatialJoin/QueryStrategy/GetObjectsQueryStrategyQueueV2.cpp
-        src/rtree/SpatialJoin/QueryStrategy/GetObjectsQueryStrategyTree.cpp
-        src/rtree/SpatialJoin/QueryStrategy/GetObjectsQueryStrategyTreeV2.cpp
-        src/rtree/SpatialJoin/QueryStrategy/GetObjectsQueryStrategyTreeV3.cpp
-        src/rtree/SpatialJoin/Visitor/GetObjectsVisitorCells.cpp
-        src/rtree/Statistic/GetObjectsQueryTopK.cpp
-        src/rtree/Statistic/GetObjectsQueryMaxMBR.cpp
-        src/rtree/Statistic/GetObjectsQueryMaxTopK.cpp
-        src/rtree/Statistic/GetObjectsQueryMinTopK.cpp
-        src/algebra/algebra.cpp
-        src/k2raster/util/QNode.cpp
-        src/k2raster/util/InfoMinSubMatrix.cpp
-        libs/RePair/Coder/arrayg.cpp
-        libs/RePair/Coder/basics.cpp
-        libs/RePair/Coder/hash.cpp
-        libs/RePair/Coder/heap.cpp
-        libs/RePair/Coder/records.cpp
-        libs/RePair/Coder/dictionary.cpp
-        libs/RePair/Coder/IRePair.cpp
-        libs/RePair/Coder/CRePair.cpp
-        libs/RePair/RePair.cpp
-        libs/RePair/rp-utils/LogSequence.cpp
-        libs/RePair/rp-utils/DAC_VLS.cpp)
-
-# Flags
-set(CMAKE_CXX_FLAGS " -Wall -m64")
-set(CMAKE_CXX_FLAGS_RELEASE " -std=c++0x -Wall -O9")
-set(CMAKE_CXX_FLAGS_DEBUG " -std=c++0x -O9 ")
-#set(CMAKE_CXX_FLAGS_DEBUG " -std=c++0x -g3 -DDEBUG")
-#set(CMAKE_CXX_FLAGS_DEBUG " -std=c++0x -pg ")
-
-# set default compilation and show details for debug build
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Release")
-elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CMAKE_VERBOSE_MAKEFILE ON)
-endif (NOT CMAKE_BUILD_TYPE)
-
-# Create the library
-add_library(k2raster STATIC ${SOURCES})
-install(TARGETS k2raster DESTINATION lib)
-install(DIRECTORY "includes" DESTINATION includes/libk2raster)
-
-#Add libraries
-# Add libcds
-set(LIBCDS_DIR "./libs/libcds2/")
-include_directories(${LIBCDS_DIR})
-include_directories(${LIBCDS_DIR}includes/)
-add_subdirectory(${LIBCDS_DIR})
-
-#Add libUtils
-set(LIBUTILS_DIR "./libs/libUtils/")
-include_directories(${LIBUTILS_DIR})
-include_directories(${LIBUTILS_DIR}include/)
-add_subdirectory(${LIBUTILS_DIR})
-
-# Add libEncoders
-#set(LIBENCODERS_DIR "./libs/libEncoders")
-#include_directories(${LIBENCODERS_DIR})
-#include_directories(${LIBENCODERS_DIR}include/)
-#LINK_DIRECTORIES(./libs/libEncoders/lib)
-
-# Add VByte
-set(LIBVBYTE_DIR "./libs/libVByte/")
-include_directories(${LIBVBYTE_DIR})
-include_directories(${LIBVBYTE_DIR}include/)
-add_subdirectory(${LIBVBYTE_DIR})
+        include/k2_raster_base.hpp
+        include/k2_raster.hpp
+        include/k2_raster_plain.hpp
+        include/k2_raster_heuristic.hpp
+        include/temporal/k2_raster_temporal_base.hpp
+        include/temporal/k2_raster_temporal.hpp
+        include/temporal/t_k2_raster.hpp
+        include/temporal/at_k2_raster.hpp
+        include/temporal/k2_raster_temporal_global.hpp
+        include/temporal/helpers/t_k2_raster_log.hpp
+        include/temporal/helpers/t_k2_raster_plain_log.hpp
+        include/temporal/helpers/t_k2_raster_heuristic_log.hpp
+        include/temporal/helpers/k2_raster_heuristic_log.hpp
+        include/utils/utils_heuristic.hpp
+        include/utils/utils_query.hpp
+        include/utils/query/query.hpp
+        include/utils/dac_vector.hpp
+        include/utils/utils_data.hpp
+        include/utils/utils_time.hpp
+        )
 
 
-# Add libspatialindex
-set(LIBSPTATIALINDEX_DIR "./libs/spatialindex/")
-include_directories(${LIBSPTATIALINDEX_DIR})
-include_directories(${LIBSPTATIALINDEX_DIR}include/)
-include_directories(${LIBSPTATIALINDEX_DIR}include/spatialindex)
-add_subdirectory(${LIBSPTATIALINDEX_DIR})
+# k2-raster
+add_executable(encode_k2r src/k2_raster_encode.cpp ${SOURCES})
+target_link_libraries(encode_k2r sdsl divsufsort divsufsort64)
+
+add_executable(check_k2r src/k2_raster_check.cpp ${SOURCES})
+target_link_libraries(check_k2r sdsl divsufsort divsufsort64)
+
+add_executable(get_cell_k2r src/k2_raster_get_cell.cpp ${SOURCES})
+target_link_libraries(get_cell_k2r sdsl divsufsort divsufsort64)
+
+add_executable(get_cells_by_value_k2r src/k2_raster_get_cells_by_value.cpp ${SOURCES})
+target_link_libraries(get_cells_by_value_k2r sdsl divsufsort divsufsort64)
+
+add_executable(get_values_window_k2r src/k2_raster_get_values_window.cpp ${SOURCES})
+target_link_libraries(get_values_window_k2r sdsl divsufsort divsufsort64)
+
+add_executable(check_values_window_k2r src/k2_raster_check_values_window.cpp ${SOURCES})
+target_link_libraries(check_values_window_k2r sdsl divsufsort divsufsort64)
 
 
-# Executables
-add_executable(Encodek2Raster ./src/encodek2Raster.cpp)
-add_executable(Infok2Raster ./src/infok2Raster.cpp)
-add_executable(GetCellValuek2Raster ./src/testGetCellValue.cpp)
-add_executable(GetCellsRangeValuek2Raster ./src/testGetCellsRangeValue.cpp)
-add_executable(GetValuesWindowk2Raster ./src/testGetValuesWindow.cpp)
-add_executable(CheckValuesk2Raster ./src/testCheckValues.cpp)
-add_executable(GetCellValueFilesk2Raster ./src/testGetCellValueFiles.cpp)
-add_executable(GetCellsRangeValueFilesk2Raster ./src/testGetCellsRangeValueFiles.cpp)
-add_executable(GetValuesWindowFilesk2Raster ./src/testGetValuesWindowFiles.cpp)
+# Temporal
+add_executable(encode_tk2r src/temporal/k2_raster_temporal_encode.cpp ${SOURCES})
+target_link_libraries(encode_tk2r sdsl divsufsort divsufsort64)
 
-# Executables RTree
-#add_executable(JoinRTreek2Raster ./src/jointRTree.cpp)
-add_executable(JoinTreek2Raster src/exec/SpatialJoin/jointRTree.cpp)
+add_executable(get_cell_tk2r src/temporal/k2_raster_temporal_get_cell.cpp ${SOURCES})
+target_link_libraries(get_cell_tk2r sdsl divsufsort divsufsort64)
 
-# Executables Algebra
-add_executable(AlgebraOperation ./src/exec/algebra/algebraOperation.cpp)
-add_executable(AlgebraOperationInMemory ./src/exec/algebra/algebraOperationInMemory.cpp)
+add_executable(get_cells_by_value_tk2r src/temporal/k2_raster_temporal_get_cells_by_value.cpp ${SOURCES})
+target_link_libraries(get_cells_by_value_tk2r sdsl divsufsort divsufsort64)
 
-# Executables Statistic
-add_executable(GetMaxMBR ./src/exec/Statistics/statisticRTreeMaxMBR.cpp)
-add_executable(GetMaxTopK ./src/exec/Statistics/statisticRTreeMaxTopK.cpp)
-add_executable(GetMinTopK ./src/exec/Statistics/statisticRTreeMinTopK.cpp)
+add_executable(get_values_window_tk2r src/temporal/k2_raster_temporal_get_values_window.cpp ${SOURCES})
+target_link_libraries(get_values_window_tk2r sdsl divsufsort divsufsort64)
 
-# Tools
-add_executable(CreateValueQueries ./tools/createValueQueries.cpp)
-add_executable(CreateValueQueriesPercentage ./tools/createValueQueriesPercentage.cpp)
-add_executable(TransformRaster ./tools/transformRaster.cpp)
+add_executable(space_tk2r src/temporal/k2_raster_temporal_space.cpp ${SOURCES})
+target_link_libraries(space_tk2r sdsl divsufsort divsufsort64)
+
+add_executable(info_tk2r src/temporal/k2_raster_temporal_info.cpp ${SOURCES})
+target_link_libraries(info_tk2r sdsl divsufsort divsufsort64)
+
+# Utils
+add_executable(create_access_queries_tk2r src/utils/create_access_queries_tk2r.cpp ${SOURCES})
+target_link_libraries(create_access_queries_tk2r sdsl divsufsort divsufsort64)
+
+add_executable(create_region_queries_tk2r src/utils/create_region_queries_tk2r.cpp ${SOURCES})
+target_link_libraries(create_region_queries_tk2r sdsl divsufsort divsufsort64)
+
+add_executable(create_window_queries_tk2r src/utils/create_window_queries_tk2r.cpp ${SOURCES})
+target_link_libraries(create_window_queries_tk2r sdsl divsufsort divsufsort64)
+
+add_executable(create_fixed_region_queries_tk2r src/utils/create_fixed_region_queries_tk2r.cpp ${SOURCES})
+target_link_libraries(create_fixed_region_queries_tk2r sdsl divsufsort divsufsort64)
+
 
 # TEST
-add_executable(TestEncodek2Raster ./test/k2raster/testEncode.cpp)
-add_executable(TestGetCellValue ./test/k2raster/testGetCellValue.cpp)
-add_executable(TestGetCellsRangeValue ./test/k2raster/testGetCellsRangeValue.cpp)
-add_executable(TestDecompress ./test/k2raster/testDecompress.cpp)
+add_executable(test_k2_raster test/test_k2_raster.cpp ${SOURCES})
+target_link_libraries(test_k2_raster sdsl divsufsort divsufsort64 gtest)
 
-# PROBAS
-add_executable(ProbarRePair ./src/exec/Probas/probar-repair.cpp)
-target_link_libraries(ProbarRePair LINK_PUBLIC k2raster cds utils vbyte)
+add_executable(test_k2_raster_plain test/test_k2_raster_plain.cpp ${SOURCES})
+target_link_libraries(test_k2_raster_plain sdsl divsufsort divsufsort64 gtest)
 
+add_executable(test_k2_raster_heuristic test/test_k2_raster_heuristic.cpp ${SOURCES})
+target_link_libraries(test_k2_raster_heuristic sdsl divsufsort divsufsort64 gtest)
 
-# Target libraries
-target_link_libraries(Encodek2Raster LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(Infok2Raster LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(GetCellValuek2Raster LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(GetCellsRangeValuek2Raster LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(GetValuesWindowk2Raster LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(CheckValuesk2Raster LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(GetCellValueFilesk2Raster LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(GetCellsRangeValueFilesk2Raster LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(GetValuesWindowFilesk2Raster LINK_PUBLIC k2raster cds utils vbyte)
+# TEST (temporal)
+add_executable(test_k2_raster_temporal test/temporal/test_k2_raster_temporal.cpp ${SOURCES})
+target_link_libraries(test_k2_raster_temporal sdsl divsufsort divsufsort64 gtest)
 
-# Target libraries RTree
-#target_link_libraries(JoinRTreek2Raster LINK_PUBLIC k2raster cds utils vbyte spatialindex)
-target_link_libraries(JoinTreek2Raster LINK_PUBLIC k2raster cds utils vbyte spatialindex)
+add_executable(test_k2_raster_temporal_h test/temporal/test_k2_raster_temporal_h.cpp ${SOURCES})
+target_link_libraries(test_k2_raster_temporal_h sdsl divsufsort divsufsort64 gtest)
 
-# Target libraries Algebra
-target_link_libraries(AlgebraOperation LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(AlgebraOperationInMemory LINK_PUBLIC k2raster cds utils vbyte)
+add_executable(test_t_k2_raster test/temporal/test_t_k2_raster.cpp ${SOURCES})
+target_link_libraries(test_t_k2_raster sdsl divsufsort divsufsort64 gtest)
 
-# Target libraries Statistic
-target_link_libraries(GetMaxMBR LINK_PUBLIC k2raster cds utils vbyte spatialindex)
-target_link_libraries(GetMaxTopK LINK_PUBLIC k2raster cds utils vbyte spatialindex)
-target_link_libraries(GetMinTopK LINK_PUBLIC k2raster cds utils vbyte spatialindex)
+add_executable(test_at_k2_raster test/temporal/test_at_k2_raster.cpp ${SOURCES})
+target_link_libraries(test_at_k2_raster sdsl divsufsort divsufsort64 gtest)
 
-# Target libraries Tools
-target_link_libraries(CreateValueQueries LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(CreateValueQueriesPercentage LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(TransformRaster LINK_PUBLIC k2raster cds utils vbyte)
+add_executable(test_ath_k2_raster test/temporal/test_ath_k2_raster.cpp ${SOURCES})
+target_link_libraries(test_ath_k2_raster sdsl divsufsort divsufsort64 gtest)
 
-# Target libraries TEST
-target_link_libraries(TestEncodek2Raster LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(TestGetCellValue LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(TestGetCellsRangeValue LINK_PUBLIC k2raster cds utils vbyte)
-target_link_libraries(TestDecompress LINK_PUBLIC k2raster cds utils vbyte)
+# TEST (Dac)
+add_executable(test_dac test/test_new_DAC.cpp ${SOURCES})
+target_link_libraries(test_dac sdsl divsufsort divsufsort64 gtest)
