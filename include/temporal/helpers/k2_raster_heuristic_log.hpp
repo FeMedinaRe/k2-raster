@@ -94,7 +94,7 @@ namespace k2raster {
                 // Check each submatrix
                 codeword_type codeword;
                 size_type n_c = 0, n_p = 0;
-                for (auto m = 0; m < n_submatrices; m++) {
+                for (size_type m = 0; m < n_submatrices; m++) {
                     // Get word
                     std::string word(&(plain_words[m * this->k_size_word]), this->k_size_word);
                     codeword = hash_words[word];

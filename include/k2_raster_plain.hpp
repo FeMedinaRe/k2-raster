@@ -338,7 +338,7 @@ namespace k2raster {
         virtual void print_info() {
             print_info_base();
             std::cout << "Plain values:";
-            for (auto v = 0; v < k_plain_values.size(); v++) {
+            for (size_t v = 0; v < k_plain_values.size(); v++) {
                 value_type value = k_plain_values[v];
                 std::cout << value << " ";
             }
@@ -619,7 +619,7 @@ namespace k2raster {
             std::cout << "Levels: " << this->k_height << " || " << this->k_level_k1 << " (k1) + " << this->k_level_k2 << " (k2) + " << k_level_plain << " (plain)" << std::endl;
 
             std::cout << "Tree (T): ";
-            for (auto b = 0; b < this->k_t.size(); b++) {
+            for (size_t b = 0; b < this->k_t.size(); b++) {
                 std::cout << this->k_t[b];
             }
             std::cout << "(\t" << this->k_t.size() << " bits)" << std::endl;
@@ -629,9 +629,9 @@ namespace k2raster {
 
             std::cout << std::endl;
             std::cout << "LMax:" << std::endl;
-            for (auto l = 0; l < this->k_list_max.size(); l++) {
+            for (size_t l = 0; l < this->k_list_max.size(); l++) {
                 std::cout << "L" << l+1 << ": ";
-                for (auto v = 0; v < this->k_list_max[l].size(); v++) {
+                for (size_t v = 0; v < this->k_list_max[l].size(); v++) {
                     value_type value = this->k_list_max[l][v];
                     std::cout << value << " ";
                 }
@@ -640,9 +640,9 @@ namespace k2raster {
 
             std::cout << std::endl;
             std::cout << "LMin:" << std::endl;
-            for (auto l = 0; l < this->k_list_min.size(); l++) {
+            for (size_t l = 0; l < this->k_list_min.size(); l++) {
                 std::cout << "L" << l+1 << ": ";
-                for (auto v = 0; v < this->k_list_min[l].size(); v++) {
+                for (size_t v = 0; v < this->k_list_min[l].size(); v++) {
                     value_type value = this->k_list_min[l][v];
                     std::cout << value << " ";
                 }

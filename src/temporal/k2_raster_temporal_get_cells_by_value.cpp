@@ -71,7 +71,7 @@ void run_queries(std::string k2raster_filename, const std::string &query_filenam
     /*********************/
 
     auto t1 = util::time::user::now(); // Start time
-    size_t total_num_cells;
+    size_t total_num_cells = 0;
     for (uint r = 0; r < nreps; r++) {
         total_num_cells = 0;
 #ifndef NDEBUG

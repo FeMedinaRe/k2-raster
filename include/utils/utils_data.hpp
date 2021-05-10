@@ -48,8 +48,8 @@ namespace k2raster {
         std::vector<value_type> values;
         values.reserve(size_x * size_y);
 
-        for (auto r = 0; r < size_x; r++) {
-            for (auto c = 0; c < size_y; c++) {
+        for (size_t r = 0; r < size_x; r++) {
+            for (size_t c = 0; c < size_y; c++) {
                 values.push_back(dis_values(gen));
             }
         }
@@ -107,8 +107,8 @@ namespace k2raster {
         assert(input.is_open() && input.good());
         size_type n = 0;
         values.resize(n_rows * n_cols);
-        for (auto r = 0; r < n_rows; r++) {
-            for (auto c = 0; c < n_cols; c++) {
+        for (size_t r = 0; r < n_rows; r++) {
+            for (size_t c = 0; c < n_cols; c++) {
                 sdsl::read_member(values[n], input);
                 n++;
             }

@@ -425,8 +425,8 @@ class k2_raster_base
         //*******************************************************//
         template<class Container>
         bool check(Container&& values, size_type n_rows, size_type n_cols) {
-            for (auto r = 0; r < n_rows; r++) {
-                for (auto c = 0; c < n_cols; c++) {
+            for (size_type r = 0; r < n_rows; r++) {
+                for (size_type c = 0; c < n_cols; c++) {
                     size_type pos = r * n_cols + c;
                     value_type v1 = get_cell(r, c);
                     value_type v2 = values[pos];
@@ -602,13 +602,12 @@ class k2_raster_base
             this->k_accum_min_values.resize(l+1);
         }
 
-        void build_t(std::vector<sdsl::int_vector<1>> tmp_t_, size_type n_nodes){
+        void build_t(const std::vector<sdsl::int_vector<1>>& tmp_t_, size_type n_nodes){
             sdsl::int_vector<1> t_(n_nodes);
             size_type n = 0;
-            ushort l;
-            for (l = 0; l < tmp_t_.size(); l++) {
-                for(auto c = 0; c < tmp_t_[l].size(); c++) {
-                    t_[n++] = tmp_t_[l][c];
+            for (auto & l : tmp_t_) {
+                for(const auto & c : l) {
+                    t_[n++] = c;
                 }
             }
             t_.resize(n);

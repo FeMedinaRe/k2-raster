@@ -394,7 +394,7 @@ namespace k2raster {
 
             // k_is_in_voc
             std::cout << "Bitmap (k_is_in_voc): ";
-            for (auto b = 0; b < this->k_is_in_voc.size(); b++) {
+            for (size_t b = 0; b < this->k_is_in_voc.size(); b++) {
                 std::cout << this->k_is_in_voc[b];
             }
             std::cout << "(\t" << this->k_is_in_voc.size() << " bits)" << std::endl;
@@ -402,7 +402,7 @@ namespace k2raster {
 
             // Encodes values
             std::cout << "Encoded values: ";
-            for (auto p = 0; p < k_encoded_values.size(); p++) {
+            for (size_t p = 0; p < k_encoded_values.size(); p++) {
                 value_type value = k_encoded_values[p];
                 std::cout << value << " ";
             }
@@ -411,7 +411,7 @@ namespace k2raster {
 
             // Encodes values
             std::cout << "Plain values:";
-            for (auto v = 0; v < this->k_plain_values.size(); v++) {
+            for (size_t v = 0; v < this->k_plain_values.size(); v++) {
                 value_type value = this->k_plain_values.access(v);
                 std::cout << value << " ";
             }
@@ -423,9 +423,9 @@ namespace k2raster {
             std::cout << "Number of entries: " << k_n_words << " || Length of word: " << k_size_word << std::endl;
             auto* tmp =  (value_type*)k_voc.data();
             size_type tmp_size =k_size_word / sizeof(value_type);
-            for (auto w = 0; w < k_n_words; w++) {
+            for (size_type w = 0; w < k_n_words; w++) {
                 std::cout << "Entry " << w << ": ";
-                for (auto p = 0; p < tmp_size; p++){
+                for (size_type p = 0; p < tmp_size; p++){
                     std::cout << tmp[w * tmp_size + p] << " ";
                 }
                 std::cout << std::endl;
@@ -482,7 +482,7 @@ namespace k2raster {
                 char * plain_words = (char *)plain_values_.data();
                 auto sub_size = this->m_size_leaves;                  // Size of each (leaf) submatrix
                 k_size_word = sub_size * sizeof(value_type);            // Size, in bytes, of each submatrix
-                auto n_submatrices = plain_values_.size() / sub_size;
+                size_t n_submatrices = plain_values_.size() / sub_size;
 
                 /******************************************************************************/
                 /* FIRST STEP - Calculate frequency of each "word" and each different "value" */
@@ -551,7 +551,7 @@ namespace k2raster {
                     // Check each submatrix
                     codeword_type codeword;
                     size_type n_c = 0, n_p = 0;
-                    for (auto m = 0; m < n_submatrices; m++) {
+                    for (size_t m = 0; m < n_submatrices; m++) {
                         // Get word
                         std::string word(&(plain_words[m * k_size_word]), k_size_word);
                         codeword = hash_words[word];

@@ -7,7 +7,7 @@ set(PROJECT_VENDOR "Fernando Silva-Coira")
 set(CMAKE_PROJECT_NAME "k2-raster_sdsl")
 set(PROJECT_CONTACT "fernando.silva@udc.es")
 
-set(CMAKE_BUILD_TYPE "Debug")
+set(CMAKE_BUILD_TYPE "Release")
 
 # Set output folder
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

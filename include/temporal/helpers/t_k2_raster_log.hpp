@@ -445,9 +445,9 @@ protected:
     void build_eqB(std::vector<sdsl::int_vector<1>> &tmp_eqB_, size_type n_nodes) {
         sdsl::int_vector<1> eqB_(n_nodes);
         size_type n = 0;
-        for(auto l = 0; l < tmp_eqB_.size(); l++) {
-            for (auto c = 0; c < tmp_eqB_[l].size(); c++) {
-                eqB_[n++] = tmp_eqB_[l][c];
+        for(auto & l : tmp_eqB_) {
+            for (const auto & c : l) {
+                eqB_[n++] = c;
             }
         }
         eqB_.resize(n);

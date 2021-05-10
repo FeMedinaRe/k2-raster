@@ -252,7 +252,7 @@ class dac_vector_dp_opt
                 m_table_base.resize(bit_sizes.size());
                 m_table_base[0] = 0;
                 size_t k_val;
-                for (auto b = 1; b < bit_sizes.size(); b++) {
+                for (size_t b = 1; b < bit_sizes.size(); b++) {
                     k_val = 1 << bit_sizes[b-1];
                     m_table_base[b] = m_table_base[b-1] + k_val;
                 }

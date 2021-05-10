@@ -262,8 +262,8 @@ public:
                 /* Check cell        */
                 /*********************/
                 value_type v1, v2;
-                for (auto r = 0 ; r < n_rows; r++) {
-                    for (auto c = 0; c < n_cols; c++) {
+                for (size_t r = 0 ; r < n_rows; r++) {
+                    for (size_t c = 0; c < n_cols; c++) {
                         size_type pos = r * n_cols + c;
                         v1 = get_cell(r, c, time_count);
                         v2 = values[pos];

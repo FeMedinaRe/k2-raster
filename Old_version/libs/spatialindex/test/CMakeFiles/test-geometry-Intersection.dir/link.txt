@@ -1,1 +1,0 @@
-/usr/bin/c++    -pedantic -Wall -Wpointer-arith -Wcast-align -Wcast-qual  -Wredundant-decls -Wno-long-long -std=c++98 -ansi -O2 -g -DNDEBUG   CMakeFiles/test-geometry-Intersection.dir/geometry/Intersection.cc.o  -o ../bin/test-geometry-Intersection -rdynamic ../bin/libspatialindex.a 

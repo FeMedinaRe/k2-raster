@@ -315,7 +315,7 @@ public:
         double total_size = 0;
         std::string type;
 
-        for (auto t = 0; t < times; t++) {
+        for (size_type t = 0; t < times; t++) {
 
             size_type pos_snap = t == 0 ? 0 : k_is_snapshot_rank1(t);
             if ( k_is_snapshot[t] == 0) {

@@ -54,7 +54,7 @@ namespace k2raster_heuristic {
         char *t_word;
 
         // Adds submatrices and their values into the hash tables
-        for (auto m = 0; m < n_submatrices; m++) {
+        for (size_type m = 0; m < n_submatrices; m++) {
             // Get word
             t_word = &(((char *)plain_values)[m * size_word]); // TODO check this
             std::string word(t_word, size_word);
@@ -71,7 +71,7 @@ namespace k2raster_heuristic {
 
             // Check all values of the submatrix
             value_type *values = (value_type*)(t_word);
-            for (auto v = 0; v < sub_size; v++) {
+            for (size_type v = 0; v < sub_size; v++) {
                 // Get value
                 value_type value = values[v];
 
@@ -180,7 +180,7 @@ namespace k2raster_heuristic {
             codeword = hash_words[word];
             if (codeword > 0) {
                 // Copy word
-                for (auto p = 0; p < size_word; p++) {
+                for (size_type p = 0; p < size_word; p++) {
                     voc[((codeword-1) * size_word) + p] = word.data()[p];
                 }
             } else {

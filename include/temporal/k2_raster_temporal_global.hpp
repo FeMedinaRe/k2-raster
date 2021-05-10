@@ -205,9 +205,9 @@ namespace k2raster {
 
             /****** Vector of rasters ******/
             written_bytes += write_member(k_rasters.size(), out, child, "num_t");
-            for (auto l = 0; l < k_rasters.size(); l++) {
-                std::string name = "raster_t_" + std::to_string(l);
-                written_bytes += k_rasters[l].serialize(out, child, name);
+            for (size_t l = 0; l < k_rasters.size(); l++) {
+                std::string name_r = "raster_t_" + std::to_string(l);
+                written_bytes += k_rasters[l].serialize(out, child, name_r);
             }
 
             sdsl::structure_tree::add_size(child, written_bytes);
@@ -229,7 +229,7 @@ namespace k2raster {
             sdsl::read_member(t, in);
             k_rasters.resize(t);
             k_rasters.shrink_to_fit();
-            for (auto l = 0; l < t; l++) {
+            for (ulong l = 0; l < t; l++) {
                 k_rasters[l].load(in, k_voc);
             }
         }
@@ -238,7 +238,7 @@ namespace k2raster {
             size_type times = k_rasters.size();
             double size;
             double total_size = 0;
-            for (auto t = 0; t < times; t++) {
+            for (size_type t = 0; t < times; t++) {
                 size = sdsl::size_in_mega_bytes(k_rasters[t]);
                 std::cout << "Time " << t << ": " << std::setprecision(2) << std::fixed << size << " Mbs" << std::endl;
                 total_size += size;
@@ -337,7 +337,7 @@ namespace k2raster {
             // A word consists of the fusion of all values ​​of the submatrix
             auto sub_size = k2_rasters_plain[0].m_size_leaves;         // Size of each (leaf) submatrix
             k_size_word = sub_size * sizeof(value_type);            // Size, in bytes, of each submatrix
-            size_type total_submatrices=0, total_values=0;
+            size_type total_submatrices=0;
 
             /******************************************************************************/
             /* FIRST STEP - Calculate frequency of each "word" and each different "value" */

@@ -505,7 +505,7 @@ namespace k2raster {
                                             size_type or_x, size_type or_y, size_type window_size) {
             size_type pos;
             size_type c_base_x, c_base_y;
-            value_type max_value, min_value;
+            value_type max_value;
 
             ushort k = this->get_k(level-1);                        // Current value of "k"
             bool is_uniform, is_leaf = level == this->k_height;     // True -> They are leaves

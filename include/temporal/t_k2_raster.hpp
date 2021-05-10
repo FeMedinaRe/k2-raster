@@ -286,7 +286,7 @@ public:
         double total_size = 0;
         std::string type;
 
-        for (auto t = 0; t < times; t++) {
+        for (size_type t = 0; t < times; t++) {
             size_type last_snap = (t / k_snapshots_freq);
             if (t % k_snapshots_freq) {
                 // It is a log

@@ -51,7 +51,7 @@ namespace k2raster {
 
         // Create random queries
         size_type x, y, t;
-        for (auto q = 0; q < n_queries; q++) {
+        for (size_type q = 0; q < n_queries; q++) {
             // Add x (rows)
             x = dis_x(gen);
             outFile << x << " ";
@@ -94,7 +94,7 @@ namespace k2raster {
 
         size_type x1, x2, y1, y2, t1, t2;
         value_type v1, v2;
-        for (auto q = 0; q < n_queries; q++) {
+        for (size_type q = 0; q < n_queries; q++) {
             // Add x (rows)
             x1 = dis_x(gen);
             x2 = dis_x(gen);
@@ -156,7 +156,7 @@ namespace k2raster {
 
         size_type x1, y1, t1;
         value_type v1;
-        for (auto q = 0; q < n_queries; q++) {
+        for (size_type q = 0; q < n_queries; q++) {
             // Add x (rows)
             x1 = dis_x(gen);
             outFile << x1 << " " << x1 + row_size << " ";

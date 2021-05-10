@@ -245,7 +245,7 @@ namespace k2raster {
                 char * plain_words = (char *)plain_values_.data();
                 auto sub_size = this->k_size_leaves;                  // Size of each (leaf) submatrix
                 k_size_word = sub_size * sizeof(value_type);            // Size, in bytes, of each submatrix
-                auto n_submatrices = plain_values_.size() / sub_size;
+                size_type n_submatrices = plain_values_.size() / sub_size;
 
                 /******************************************************************************/
                 /* FIRST STEP - Calculate frequency of each "word" and each different "value" */
@@ -314,7 +314,7 @@ namespace k2raster {
                     // Check each submatrix
                     codeword_type codeword;
                     size_type n_c = 0, n_p = 0;
-                    for (auto m = 0; m < n_submatrices; m++) {
+                    for (size_type m = 0; m < n_submatrices; m++) {
                         // Get word
                         std::string word(&(plain_words[m * k_size_word]), k_size_word);
                         codeword = hash_words[word];

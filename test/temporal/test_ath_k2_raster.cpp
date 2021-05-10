@@ -112,7 +112,7 @@ TYPED_TEST(test_ath_k2_raster, QueryGet){
     output_file.close();
 
     // Get 'n_random_queries' positions
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (uint n = 0; n < n_random_queries; n++) {
         auto row = dis_row(gen);
         auto col = dis_col(gen);
         auto t = dis_time(gen);
@@ -141,7 +141,7 @@ TYPED_TEST(test_ath_k2_raster, QueryGetCellsByValue){
     output_file.close();
 
     // Run 'n_random_queries' queries
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (uint n = 0; n < n_random_queries; n++) {
         auto xini = dis_row(gen);
         auto yini = dis_col(gen);
         auto tini = dis_time(gen);
@@ -216,7 +216,7 @@ TYPED_TEST(test_ath_k2_raster, QueryGetValuesWindow){
     output_file.close();
 
     // Run 'n_random_queries' queries
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (uint n = 0; n < n_random_queries; n++) {
         auto xini = dis_row(gen);
         auto yini = dis_col(gen);
         auto tini = dis_time(gen);
@@ -252,7 +252,7 @@ TYPED_TEST(test_ath_k2_raster, QueryCheckValuesWindowStrong){
     output_file.close();
 
     // Run 'n_random_queries' queries
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (uint n = 0; n < n_random_queries; n++) {
         auto xini = dis_row(gen);
         auto yini = dis_col(gen);
         auto tini = dis_time(gen);
@@ -298,7 +298,7 @@ TYPED_TEST(test_ath_k2_raster, QueryCheckValuesWindowWeak){
     output_file.close();
 
     // Run 'n_random_queries' queries
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (uint n = 0; n < n_random_queries; n++) {
         auto xini = dis_row(gen);
         auto yini = dis_col(gen);
         auto tini = dis_time(gen);
