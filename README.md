@@ -160,7 +160,9 @@ Given a region and a range, this query checks if all cell values of the region a
 
 #### Obtaining a cell value ([get_cell](src/temporal/k2_raster_temporal_get_cell.cpp))
 
+## Spatial Join 
 
+For the *Spatial Join* functionality, please use the version 1 ([V1](Other versions/k2-raster V1.tar.gz)) of the k<sup>2</sup>. 
 
 ## Publications ##
 
