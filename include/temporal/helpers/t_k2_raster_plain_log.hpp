@@ -58,7 +58,7 @@ namespace k2raster {
         ushort k_level_k2=0;
         ushort k_level_plain=0;
 
-        ushort k_size_leaves=0;
+        size_t k_size_leaves=0;
         t_values_last k_plain_values;
 
     public:
@@ -350,7 +350,7 @@ protected:
             child_node = {std::numeric_limits<value_type>::max(), std::numeric_limits<value_type>::min()};
             diff_node = {std::numeric_limits<value_type>::max(), std::numeric_limits<value_type>::min()};
 
-            if (level == this->k_level_k1 + this->k_level_k2 + 1) {
+            if (level == this->k_level_k1 + this->k_level_k2) {
                 value_type value;
                 /****************/
                 /* PLAIN VALUES */
@@ -686,7 +686,7 @@ protected:
     }
 
     virtual short get_cell_n_levels() const {
-        return std::min(this->k_level_k1 + this->k_level_k2+1, this->k_height-1);
+        return std::min(this->k_level_k1 + this->k_level_k2, this->k_height-1);
     }
 
 }; // END CLASS t_k2_raster_heuristic_log

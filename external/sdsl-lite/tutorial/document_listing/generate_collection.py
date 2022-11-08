@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
 import fnmatch
-import sys
 import os
 import re
+import sys
 
 includes = ['*.cpp','*.hpp'] # sources only
 includes = r'|'.join([fnmatch.translate(x) for x in includes])

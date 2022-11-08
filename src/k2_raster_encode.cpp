@@ -32,11 +32,12 @@
 #include <k2_raster.hpp>
 #include <k2_raster_heuristic.hpp>
 #include <utils/utils_time.hpp>
+#include <utils/args/utils_args_raster.hpp>
 
-void print_help(char * argv0) {
-    printf("Usage: %s <input_data> <rows> <cols> <output_data> <set_check> <type> <k1> [k2 level_k1 [plain_levels]] \n",
-           argv0);
-}
+// void print_help(char * argv0) {
+//    printf("Usage: %s <input_data> <rows> <cols> <output_data> <set_check> <type> <k1> [k2 level_k1 [plain_levels]] \n",
+//           argv0);
+//}
 
 template<typename k2_raster_type>
 void run_encode(std::vector<int> values, size_t n_rows, size_t n_cols,
@@ -48,6 +49,7 @@ void run_encode(std::vector<int> values, size_t n_rows, size_t n_cols,
     /*********************/
 #ifndef NDEBUG
     std::cout << std::endl << "Creating k2-raster structure for matrix " << n_rows << "x" << n_cols << std::endl;
+    std::cout << "Parameters: k1:" << k1 << " k2:" << k2 << " level_k1:" << level_k1 << " plains_levels:" << plains_levels << std::endl;
 #endif
     auto t1 = util::time::user::now(); // Start time
     k2_raster_type k2raster(values, n_rows, n_cols, k1, k2, level_k1, plains_levels);
@@ -60,8 +62,8 @@ void run_encode(std::vector<int> values, size_t n_rows, size_t n_cols,
     std::cout << " milliseconds." << std::endl;
 
     size_t k2_raster_size = sdsl::size_in_bytes(k2raster);
-    double ratio = (k2_raster_size * 100.) / (n_rows * n_cols * sizeof(int));
-    std::cout << "k2-rater space:" << k2_raster_size << " bytes (" << ratio << "%)" << std::endl;
+    double ratio = ((double)k2_raster_size * 100.) / (double)(n_rows * n_cols * sizeof(int));
+    std::cout << "k2-rater space:" << k2_raster_size << " bytes || " << sdsl::size_in_mega_bytes(k2raster) << " MB (" << ratio << "%)" << std::endl;
 
     /*********************/
     /* Save structure    */
@@ -97,42 +99,26 @@ void run_encode(std::vector<int> values, size_t n_rows, size_t n_cols,
     }
 }
 
-
-
 int main(int argc, char **argv) {
-
-    if (argc != 8 && argc != 11) {
-        print_help(argv[0]);
-        exit(-1);
-    }
 
     /*********************/
     /* Reads params      */
     /*********************/
-    std::string values_filename = argv[1];
-    size_t rows = atoi(argv[2]);
-    size_t cols = atoi(argv[3]);
-    std::string output_data = argv[4];
-    bool set_check = atoi(argv[5]);
-    ushort k2_raster_type = atoi(argv[6]);
-    ushort k1 = atoi(argv[7]);
-    ushort k2 = (argc >= 10 ? atoi(argv[8]) : k1);
-    ushort level_k1 = (argc >= 10 ? atoi(argv[9]) : 0);
-    ushort plain_levels = (argc == 11 ? atoi(argv[10]) : 0);
-
+    args_encode args;
+    parse_args_encode(argc, argv, args);
 
     /*********************/
     /* Reads input data  */
     /*********************/
-    std::ifstream values_file(values_filename); // Open file
-    assert(values_file.is_open() && values_file.good());
+    std::ifstream input_file(args.input_data); // Open file
+    assert(input_file.is_open() && input_file.good());
 
 
-    std::vector<int> values(rows * cols);
+    std::vector<int> values(args.rows * args.cols);
     size_t n = 0;
-    for (size_t r = 0; r < rows; r++) {
-        for (size_t c = 0; c < cols; c++) {
-            sdsl::read_member(values[n], values_file);
+    for (size_t r = 0; r < args.rows; r++) {
+        for (size_t c = 0; c < args.cols; c++) {
+            sdsl::read_member(values[n], input_file);
             n++;
         }
     }
@@ -140,20 +126,29 @@ int main(int argc, char **argv) {
     /*********************/
     /* Encodes data      */
     /*********************/
-    switch (k2_raster_type) {
+    switch (args.type) {
         case k2raster::K2_RASTER_TYPE:
-            run_encode<k2raster::k2_raster<>>(values, rows, cols, k1, k2, level_k1, plain_levels, output_data, set_check);
+#ifndef NDEBUG
+            std::cout << std::endl <<  "Type " << args.type << " - Hybrid k2-raster" << std::endl;
+#endif
+            run_encode<k2raster::k2_raster<>>(values, args.rows, args.cols, args.k1, args.k2, args.level_k1, args.plain_levels, args.output_data, args.set_check);
             break;
         case k2raster::K2_RASTER_TYPE_PLAIN:
-            run_encode<k2raster::k2_raster_plain<>>(values, rows, cols, k1, k2, level_k1, plain_levels, output_data, set_check);
+#ifndef NDEBUG
+            std::cout << std::endl << "Type " << args.type << " - plain k2-raster" << std::endl;
+#endif
+            run_encode<k2raster::k2_raster_plain<>>(values, args.rows, args.cols, args.k1, args.k2, args.level_k1, args.plain_levels, args.output_data, args.set_check);
             break;
         case k2raster::K2_RASTER_TYPE_HEURISTIC:
-            run_encode<k2raster::k2_raster_heuristic<>>(values, rows, cols, k1, k2, level_k1, plain_levels, output_data, set_check);
+#ifndef NDEBUG
+            std::cout << std::endl << "Type " << args.type << " - Heuristic k2-raster" << std::endl;
+#endif
+            run_encode<k2raster::k2_raster_heuristic<>>(values, args.rows, args.cols, args.k1, args.k2, args.level_k1, args.plain_levels, args.output_data, args.set_check);
             break;
         default:
-            print_help(argv[0]);
-            std::cout << "Invalid type " << k2_raster_type << ": " << std::endl;
-            std::cout << "\t Type " << k2raster::K2_RASTER_TYPE_PLAIN << ": hybrid k2-raster." << std::endl;
+            print_usage_encode(argv);
+            std::cout << "Invalid type " << args.type << ": " << std::endl;
+            std::cout << "\t Type " << k2raster::K2_RASTER_TYPE << ": hybrid k2-raster." << std::endl;
             std::cout << "\t Type " << k2raster::K2_RASTER_TYPE_PLAIN << ": k2-raster with plain values." << std::endl;
             std::cout << "\t Type " << k2raster::K2_RASTER_TYPE_HEURISTIC << ": heuristic k2-raster ." << std::endl;
             exit(-1);

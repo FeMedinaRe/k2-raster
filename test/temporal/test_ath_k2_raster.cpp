@@ -41,20 +41,20 @@ std::string output_filename = "../../test/Output/temporal.k2rt";
 std::string inputs_filename = data_folder + "datasets.txt";
 
 // Data params
-size_t rows = 1000;
-size_t cols = 1000;
+size_t rows = 800;
+size_t cols = 800;
 size_t times = 10;
 int min_value = 0;
 int max_value = 5;
 
 // Structure params
-uint k1 = 4;
+std::vector<ushort> ks = {4, 2};
+std::vector<ushort> levels_k1 = {1, 2, 3};
+std::vector<ushort> levels_plain = {0, 1, 2};
 uint k2 = 2;
-uint levels_k1 = 4;
-uint plain_levels = 2;
 size_t snap_freq = 4;
 size_t scale_factor =0;
-uint n_random_queries = 100;
+size_t n_random_queries = 100;
 
 // Random number generator
 std::random_device rd;  //Will be used to obtain a seed for the random number engine
@@ -79,17 +79,24 @@ typedef Types<
 
 TYPED_TEST_CASE(test_ath_k2_raster, Implementations);
 
-// TEST Encode - Create k2_raster temporal (in-memory)
-TYPED_TEST(test_ath_k2_raster, CreateInMemory){
+// TEST Encode - Create t-k2_raster (in-memory)
+TYPED_TEST(test_ath_k2_raster, CreateAndSotre){
 
-    // Build structure
-    TypeParam k2raster(inputs_filename, data_folder, snap_freq, scale_factor);
+    for(auto const &k1 : ks) {
+        for(auto const &level_k1 : levels_k1) {
+            for(auto const &level_plain : levels_plain) {
+                // Build structure
+                TypeParam k2raster(inputs_filename, data_folder, snap_freq, scale_factor);
 
-    // Check values
-    ASSERT_TRUE(k2raster.check(inputs_filename, data_folder, scale_factor));
+                // Check values
+                ASSERT_TRUE(k2raster.check(inputs_filename, data_folder, scale_factor));
 
-    // Store to file
-    ASSERT_TRUE(store_to_file(k2raster, output_filename));
+                // Store to file
+                std::string filename = output_filename + std::to_string(k1) + "_" + std::to_string(k2) + "_" + std::to_string(level_k1) + "_" + std::to_string(level_plain);
+                ASSERT_TRUE(store_to_file(k2raster, filename));
+            } // END FOR level_plain
+        } // END FOR level_k1
+    } // END FOR k1
 }
 
 // TEST File - Load the k2-raster from a file
@@ -220,9 +227,9 @@ TYPED_TEST(test_ath_k2_raster, QueryGetValuesWindow){
         auto xini = dis_row(gen);
         auto yini = dis_col(gen);
         auto tini = dis_time(gen);
-        std::uniform_int_distribution<> dis_max_row(xini, rows-1);
-        std::uniform_int_distribution<> dis_max_col(yini, cols-1);
-        std::uniform_int_distribution<> dis_max_time(tini, times-1);
+        std::uniform_int_distribution<size_t> dis_max_row(xini, rows-1);
+        std::uniform_int_distribution<size_t> dis_max_col(yini, cols-1);
+        std::uniform_int_distribution<size_t> dis_max_time(tini, times-1);
         auto xend = dis_max_row(gen);
         auto yend = dis_max_col(gen);
         auto tend = dis_max_time(gen);
@@ -233,10 +240,10 @@ TYPED_TEST(test_ath_k2_raster, QueryGetValuesWindow){
         ASSERT_EQ((xend - xini + 1)*(yend - yini + 1)*(tend - tini + 1), n_cells);
 
         // Check result (cell by cell)
-        for (auto t = tini; t <= tend; t++) {
+        for (size_t t = tini; t <= tend; t++) {
             size_t cells_region = 0;
-            for (auto x = xini; x <= xend; x++) {
-                for (auto y = yini; y <= yend; y++) {
+            for (size_t x = xini; x <= xend; x++) {
+                for (size_t y = yini; y <= yend; y++) {
                     ASSERT_EQ(k2raster.get_cell(x, y, t), result[t - tini][cells_region++]);
                 } // END FOR y
             } // END FOR x
@@ -357,7 +364,6 @@ int main(int argc, char** argv) {
 
         // Write common params
         main_file << rows  << " " << cols  << " ";                                              // Dataset size (rows and columns)
-        main_file << k1  << " " << k2  << " " << levels_k1  << " " << plain_levels << std::endl;    // k2-raster params
 
         // Create random data
         std::vector<int> values = k2raster::create_random_raster<int>(rows, cols, min_value, max_value);

@@ -31,9 +31,11 @@
 // Own libraries
 #include <utils/dac_vector.hpp>
 #include <k2_raster_base.hpp>
+//#include <utils/utils_memory.hpp>
 
 // Third libraries
 #include <sdsl/vectors.hpp>
+#include <queue>
 
 //! Namespace for the k2-raster library
 namespace k2raster {
@@ -83,6 +85,47 @@ namespace k2raster {
             // Build k2-raster
             build(c_values);
         }
+
+        //*****************************//
+        //********** ALGEBRA **********//
+        //*****************************//
+
+        // Algebra operation between two k2-rasters
+        template<class raster_type>
+        k2_raster(raster_type &k2_raster_1, raster_type &k2_raster_2, const OperationRaster operation, bool memory_opt=true) {
+            this->copy_initial_parameters(k2_raster_1, k2_raster_2);
+            if (memory_opt) {
+                this->build_operation_opt_mem(k2_raster_1, k2_raster_2, operation);
+            } else {
+                this->build_operation(k2_raster_1, k2_raster_2, operation);
+            }
+        }
+
+        // Set a 1 if the cell value is bigger then a thresholding
+        template<class raster_type>
+        k2_raster(raster_type &k2_raster_1, value_type thresholding) {
+            this->copy_initial_parameters(k2_raster_1);
+            this->build_operation_thresholding(k2_raster_1, thresholding);
+        }
+
+        // Apply a scalar operation to all cells of the raster
+        template<class raster_type>
+        k2_raster(raster_type &k2_raster_1, const value_type scalar_value, const OperationRaster operation ) {
+            this->copy_initial_parameters(k2_raster_1);
+            this->build_operation_scalar(k2_raster_1, scalar_value, operation);
+        }
+
+        // Algebra zonal operation between two k2-rasters
+        template<class raster_type>
+        k2_raster(raster_type &k2_raster_1, raster_type &k2_raster_z, const OperationZonalRaster operation, bool opt=true) {
+            this->copy_initial_parameters(k2_raster_1, k2_raster_z);
+            if (opt) {
+                this->build_operation_zonal_op(k2_raster_1, k2_raster_z, operation);
+            } else {
+                this->build_operation_zonal(k2_raster_1, k2_raster_z, operation);
+            }
+        }
+
 
         //*******************************************************//
         //*************** BASIC OPERATIONS **********************//
@@ -272,6 +315,30 @@ namespace k2raster {
                                              0, this->k_size / k, 1, strong_check);
         }
 
+        //*******************************************************//
+        //******************* DECOMPRESS ************************//
+        //*******************************************************//
+        template<class Container>
+        void decompress(Container&& values, size_type &n_rows, size_type &n_cols) {
+            size_type count_cells = 0; // Number of cells
+            n_rows = this->k_real_size_x;
+            n_cols = this->k_real_size_y;
+            values.resize(n_rows * n_cols);
+
+            // Whole matrix if uniform
+            if (this->k_t.empty()) {
+                // All cells are valid
+                value_type val = this->k_max_value;
+                for (size_type x = 0; x < n_rows; x++){
+                    for (size_type y= 0; y < n_cols; y++){
+                        values[count_cells++] = val;
+                    }
+                }
+                return;
+            }
+            ushort k = this->get_k(0);
+            decompress_helper(0, 0, this->k_max_value, 0, this->k_size / k, 1, values);
+        }
 
     protected:
         //*******************************************************//
@@ -287,10 +354,12 @@ namespace k2raster {
         //*******************************************************//
         template<class Container>
         void build(Container &&c_values) {
+            // Initialize the temporal structures
             std::vector<std::vector<value_type>> min_values_(this->k_height);
             std::vector<std::vector<value_type>> max_values_(this->k_height);
             std::vector<sdsl::int_vector<1>> tmp_t_(this->k_height-1);
 
+            // Build conceptual tree
             build(c_values, min_values_, max_values_, tmp_t_, this->k_min_value, this->k_max_value, 0, 0, 0, this->k_size);
 
             // Encode max values;
@@ -370,7 +439,7 @@ namespace k2raster {
                     // delta_min_value = min_value - child_min_value (min_value <= child_min_value)
                     // --------------------------------------------------------------------- //
                     if (level != (this->k_height-1)) {                                                 // Except last level
-                        tmp_t_[level].resize(tmp_t_[level].size() + (k * k)); // TODO improve this
+                        tmp_t_[level].resize(tmp_t_[level].size() + (k * k));
                     }
                     for (size_type c = 0; c < (k*k); c++) {
                         if (min_values_children[c] > max_values_children[c]) {
@@ -395,6 +464,1370 @@ namespace k2raster {
                 } // END IF (min_value < max_value)
             } // END IF (level == (this->k_height)
         }
+
+
+        //*****************************//
+        //********** HELPERS **********//
+        //*****************************//
+        inline void insert_node_conceptual_tree(std::vector<std::vector<value_type>> &min_values_, std::vector<std::vector<value_type>> &max_values_,
+                                                std::vector<sdsl::int_vector<1>> &tmp_t_,
+                                                std::vector<value_type> &min_values_children, std::vector<value_type> &max_values_children,
+                                                value_type &min_value, value_type &max_value,
+                                                ushort level, ushort k) {
+            // --------------------------------------------------------------------- //
+            // Apply delta to min and max values of children.
+            // All values are always equal to or greater than 0
+            // delta_max_value = max_value - child_max_value (max_value >= child_max_value)
+            // delta_min_value = min_value - child_min_value (min_value <= child_min_value)
+            // --------------------------------------------------------------------- //
+            if (level != (this->k_height-1)) {                                                 // Except last level
+                tmp_t_[level].resize(tmp_t_[level].size() + (k * k));
+            }
+            for (size_type c = 0; c < (k*k); c++) {
+                if (min_values_children[c] > max_values_children[c]) {
+                    // It is an empty submatrix, push a 0
+                    if ((level != (this->k_height-1))) {
+                        tmp_t_[level][max_values_[level].size()] = 0;
+                    }
+                    max_values_[level].push_back(0);
+                } else {
+                    max_values_[level].push_back(max_value - max_values_children[c]);
+                    if ((level != (this->k_height-1))) {                                        // Except last level
+                        if (max_values_children[c] != min_values_children[c]) {
+                            min_values_[level].push_back(min_values_children[c] - min_value);
+                            tmp_t_[level][max_values_[level].size() - 1] = 1;
+                        } else {
+                            tmp_t_[level][max_values_[level].size() - 1] = 0;
+                        }
+                    }
+                } // END IF min_values_children[c] > max_values_children[c]
+            } // END FOR children
+        }
+
+        template <class vector_values_type>
+        inline void insert_node_conceptual_tree_opt_mem(std::vector<vector_values_type> &min_values_, std::vector<vector_values_type> &max_values_,
+                                                std::vector<sdsl::int_vector<1>> &tmp_t_,
+                                                size_type &n_min_values, size_type &n_max_values,
+                                                std::vector<value_type> &min_values_children, std::vector<value_type> &max_values_children,
+                                                value_type &min_value, value_type &max_value,
+                                                ushort level, ushort k) {
+            // --------------------------------------------------------------------- //
+            // Apply delta to min and max values of children.
+            // All values are always equal to or greater than 0
+            // delta_max_value = max_value - child_max_value (max_value >= child_max_value)
+            // delta_min_value = min_value - child_min_value (min_value <= child_min_value)
+            // --------------------------------------------------------------------- //
+            if (level != (this->k_height-1)) {                                                 // Except last level
+                tmp_t_[level].resize(tmp_t_[level].size() + (k * k));
+            }
+            if (min_values_[level].size() <= (n_min_values + ( k * k ))) {
+                min_values_[level].resize(min_values_[level].size() + (k * k));
+            }
+            if (max_values_[level].size() <= (n_max_values + ( k * k ))) {
+                max_values_[level].resize(max_values_[level].size() + (k * k));
+            }
+
+            for (size_type c = 0; c < (k*k); c++) {
+                if (min_values_children[c] > max_values_children[c]) {
+                    // It is an empty submatrix, push a 0
+                    if ((level != (this->k_height-1))) {
+                        tmp_t_[level][n_max_values] = 0;
+                    }
+                    max_values_[level][n_max_values] = 0;
+                } else {
+                    max_values_[level][n_max_values] = max_value - max_values_children[c];
+                    if ((level != (this->k_height-1))) {                                        // Except last level
+                        if (max_values_children[c] != min_values_children[c]) {
+                            min_values_[level][n_min_values] = min_values_children[c] - min_value;
+                            n_min_values++;
+                            tmp_t_[level][n_max_values] = 1;
+                        } else {
+                            tmp_t_[level][n_max_values] = 0;
+                        }
+                    }
+                } // END IF min_values_children[c] > max_values_children[c]
+                n_max_values++;
+            } // END FOR children
+        }
+
+        /*inline void encode_conceptual_tree(std::vector<std::vector<value_type>> &max_values_,
+                                           std::vector<std::vector<value_type>> &min_values_,
+                                           std::vector<sdsl::int_vector<1>> &tmp_t_) {
+            // ------------------------------------------------------------------- //
+            // Encode the conceptual tree
+            // ------------------------------------------------------------------- //
+
+            // Encode max values;
+            size_type n_nodes = this->build_max_values(max_values_, tmp_t_);
+            max_values_.clear();
+            max_values_.shrink_to_fit();
+
+            // Encode min values
+            this->build_min_values(min_values_);
+            min_values_.clear();
+            min_values_.shrink_to_fit();
+
+            // Encode bitmap T (copy temporal bitmap T)
+            this->build_t(tmp_t_, n_nodes);
+        }*/
+
+        template <class vector_values>
+        inline void encode_conceptual_tree(std::vector<vector_values> &max_values_,
+                                           std::vector<vector_values> &min_values_,
+                                           std::vector<sdsl::int_vector<1>> &tmp_t_) {
+            // ------------------------------------------------------------------- //
+            // Encode the conceptual tree
+            // ------------------------------------------------------------------- //
+
+            // Encode max values;
+            size_type n_nodes = this->build_max_values(max_values_, tmp_t_);
+            max_values_.clear();
+            max_values_.shrink_to_fit();
+
+            // Encode min values
+            this->build_min_values(min_values_);
+            min_values_.clear();
+            min_values_.shrink_to_fit();
+
+            // Encode bitmap T (copy temporal bitmap T)
+            this->build_t(tmp_t_, n_nodes);
+        }
+
+
+        //*******************************************************//
+        //******************** ALGEBRA **************************//
+        //*******************************************************//
+        //*****************************//
+        //******** Operations *********//
+        //*****************************//
+        void build_operation(k2_raster &k2_raster_1, k2_raster &k2_raster_2, const OperationRaster operation){
+
+            // ------------------------------------------------------------------- //
+            // Initialize temporal structure where store max a min values and
+            // the topology of the tree
+            // ------------------------------------------------------------------- /
+            std::vector<std::vector<value_type>> min_values_(this->k_height);
+            std::vector<std::vector<value_type>> max_values_(this->k_height);
+            std::vector<sdsl::int_vector<1>> tmp_t_(this->k_height-1);
+
+            // ------------------------------------------------------------------- //
+            // Run the algorithm of construction over the matrix
+            // Return the conceptual tree that represent the k2-raster
+            // ------------------------------------------------------------------- //
+            k2raster_submatrix<value_type> node1 {k2_raster_1.max_value == k2_raster_1.min_value, k2_raster_1.max_value, 0, 0};
+            k2raster_submatrix<value_type> node2 {k2_raster_2.max_value == k2_raster_2.min_value, k2_raster_2.max_value, 0, 0};
+
+//            std::vector<size_type> last_access1(k2_raster_1.k_accum_min_values.size(), 0);
+//            std::vector<size_type> last_access2(k2_raster_2.k_accum_min_values.size(), 0);
+
+            std::vector<size_type> last_access1(k2_raster_1.k_accum_min_values);
+            std::vector<size_type> last_access2(k2_raster_2.k_accum_min_values);
+
+            check_submatrix_operation(min_values_, max_values_, tmp_t_,
+                                      this->k_min_value, this->k_max_value,
+                                      0, 0, 0, this->k_size,
+                                      k2_raster_1, k2_raster_2, node1, node2,
+                                      last_access1, last_access2,
+                                      operation);
+
+            // ------------------------------------------------------------------- //
+            // Encode the conceptual tree
+            // ------------------------------------------------------------------- //
+            encode_conceptual_tree(max_values_, min_values_, tmp_t_);
+        }
+
+        void build_operation_opt_mem(k2_raster &k2_raster_1, k2_raster &k2_raster_2, const OperationRaster operation){
+
+            // ------------------------------------------------------------------- //
+            // Initialize temporal structure where store max a min values and
+            // the topology of the tree
+            // ------------------------------------------------------------------- /
+
+            ushort width;
+            // Run operation
+            switch (operation) {
+                case OPERATION_SUM:
+                    width = sdsl::bits::hi(k2_raster_1.max_value + k2_raster_2.max_value) + 1;
+                    break;
+                case OPERATION_SUBT:
+                    width = sdsl::bits::hi(std::max(k2_raster_1.max_value, k2_raster_2.max_value));
+                    break;
+                case OPERATION_MULT:
+                    width = sdsl::bits::hi(k2_raster_1.max_value * k2_raster_2.max_value);
+                    break;
+                default:
+                    // No valid operation. The process never reaches this point
+                    exit(-1);
+            }
+
+            std::vector<sdsl::int_vector<>> min_values_(this->k_height);
+            std::vector<sdsl::int_vector<>> max_values_(this->k_height);
+            std::vector<sdsl::int_vector<1>> tmp_t_(this->k_height-1);
+            std::vector<size_type> n_min_values (this->k_height, 0);
+            std::vector<size_type> n_max_values (this->k_height, 0);
+
+            // Set width
+            for (auto &vector : min_values_) {
+                vector.width(width);
+            }
+            for (auto &vector : max_values_) {
+                vector.width(width);
+            }
+
+            // ------------------------------------------------------------------- //
+            // Run the algorithm of construction over the matrix
+            // Return the conceptual tree that represent the k2-raster
+            // ------------------------------------------------------------------- //
+            k2raster_submatrix<value_type> node1 {k2_raster_1.max_value == k2_raster_1.min_value, k2_raster_1.max_value, 0, 0};
+            k2raster_submatrix<value_type> node2 {k2_raster_2.max_value == k2_raster_2.min_value, k2_raster_2.max_value, 0, 0};
+
+//            std::vector<size_type> last_access1(k2_raster_1.k_accum_min_values.size(), 0);
+//            std::vector<size_type> last_access2(k2_raster_2.k_accum_min_values.size(), 0);
+
+            std::vector<size_type> last_access1(k2_raster_1.k_accum_min_values);
+            std::vector<size_type> last_access2(k2_raster_2.k_accum_min_values);
+
+            check_submatrix_operation_opt_mem(min_values_, max_values_, tmp_t_,
+                                              n_min_values, n_max_values,
+                                              this->k_min_value, this->k_max_value,
+                                              0, 0, 0, this->k_size,
+                                              k2_raster_1, k2_raster_2, node1, node2,
+                                              last_access1, last_access2,
+                                              operation);
+            // Free input
+            //k2_raster_1 = k2_raster();
+            //k2_raster_2 = k2_raster();
+
+            // Resize values
+            for (size_type l = 0; l < min_values_.size(); l++) {
+                min_values_[l].resize(n_min_values[l]);
+                sdsl::util::bit_compress(min_values_[l]);
+            }
+            for (size_type l = 0; l < max_values_.size(); l++) {
+                max_values_[l].resize(n_max_values[l]);
+                sdsl::util::bit_compress(max_values_[l]);
+            }
+
+            // ------------------------------------------------------------------- //
+            // Encode the conceptual tree
+            // ------------------------------------------------------------------- //
+            encode_conceptual_tree(max_values_, min_values_, tmp_t_);
+        }
+
+        void check_submatrix_operation(std::vector<std::vector<value_type>> &min_values_, std::vector<std::vector<value_type>> &max_values_, std::vector<sdsl::int_vector<1>> &tmp_t_,
+                                       value_type &min_value, value_type &max_value, size_type base_row, size_type base_col,
+                                       ushort level, size_type sub_size,
+                                       k2_raster &k2_raster_1, k2_raster &k2_raster_2,
+                                       k2raster_submatrix<value_type> &node1, k2raster_submatrix<value_type> &node2,
+                                       std::vector<size_type> &last_access1, std::vector<size_type> &last_access2,
+                                       const OperationRaster &operation) {
+
+
+            min_value = std::numeric_limits<value_type>::max();
+            max_value = std::numeric_limits<value_type>::min();
+
+            // Calculate parameters for the current level.
+            ushort k = this->get_k(level);
+            sub_size = sub_size / k;
+
+            // ------------------------------------------------------------------- //
+            // If both nodes are uniforms, the new node is also uniform
+            // ------------------------------------------------------------------- //
+            if (node1.is_uniform && node2.is_uniform) {
+
+                // Run operation
+                switch (operation) {
+                    case OPERATION_SUM:
+                        max_value = node1.max_value + node2.max_value;
+                        break;
+                    case OPERATION_SUBT:
+                        max_value = node1.max_value - node2.max_value;
+                        break;
+                    case OPERATION_MULT:
+                        max_value = node1.max_value * node2.max_value;
+                        break;
+                    default:
+                        // No valid operation. The process never reaches this point
+                        exit(-1);
+                }
+
+                min_value = max_value; // Uniform node
+            } else {
+                /*****************/
+                /* INTERNAL NODE */
+                /*****************/
+                std::vector<value_type> min_values_children(k * k);
+                std::vector<value_type> max_values_children(k * k);
+                k2raster_submatrix<value_type> child1, child2;
+                child1.level = node1.level + 1;
+                child2.level = node2.level + 1;
+
+                size_type child_base_row, child_base_col;
+
+                for (uint x = 0; x < k; x++) {
+                    child_base_row = base_row + x * sub_size;
+                    for (uint y = 0; y < k; y++) {
+                        child_base_col = base_col + y * sub_size;
+
+                        if (child_base_row < this->k_real_size_x && child_base_col < this->k_real_size_y) {
+
+                            k2_raster_1.get_next_child(node1, child1, last_access1);
+                            k2_raster_2.get_next_child(node2, child2, last_access2);
+
+                            check_submatrix_operation(min_values_, max_values_, tmp_t_,
+                                                      min_values_children[x * k + y], max_values_children[x * k + y],
+                                                      child_base_row, child_base_col, level + 1, sub_size,
+                                                      k2_raster_1, k2_raster_2, child1, child2 ,
+                                                      last_access1, last_access2, operation);
+
+                            // Calculate min/max value of the parent node (current node)
+                            if (min_values_children[x * k + y] < min_value) {
+                                min_value = min_values_children[x * k + y];
+                            }
+                            if (max_values_children[x * k + y] > max_value) {
+                                max_value = max_values_children[x * k + y];
+                            }
+                        } else {
+                            // More children in raster1? Reset last_access1
+                            if (child_base_row < k2_raster_1.k_real_size_x && child_base_col < k2_raster_1.k_real_size_y) {
+                                for (size_t l = child1.level-1; l < last_access1.size(); l++) {
+                                    last_access1[l] = 0;
+                                }
+                            }
+
+                           // More children in raster2? Reset last_access2
+                           if (child_base_row < k2_raster_2.k_real_size_x && child_base_col < k2_raster_2.k_real_size_y) {
+                               for (size_t l = child2.level-1; l < last_access2.size(); l++) {
+                                   last_access2[l] = 0;
+                               }
+                            }
+
+                            // Positions out of real matrix
+                            min_values_children[x * k + y] = std::numeric_limits<value_type>::max();
+                            max_values_children[x * k + y] = std::numeric_limits<value_type>::min();
+                        }// ENF IF within real matrix
+
+                        node1.children_pos++;
+                        node2.children_pos++;
+                    } // END for y
+                } // END for x
+
+                // Check if matrix is not empty or uniform
+                if (min_value < max_value) {
+                    insert_node_conceptual_tree(min_values_, max_values_, tmp_t_,
+                                                min_values_children, max_values_children,
+                                                min_value, max_value, level, k);
+                } // END IF (min_value < max_value)
+            } // END IF leaf-internal node
+        }
+
+        template <class vector_values_type>
+        void check_submatrix_operation_opt_mem(std::vector<vector_values_type> &min_values_, std::vector<vector_values_type> &max_values_,
+                                               std::vector<sdsl::int_vector<1>> &tmp_t_,
+                                               std::vector<size_type> &n_min_values, std::vector<size_type> &n_max_values,
+                                       value_type &min_value, value_type &max_value,
+                                       size_type base_row, size_type base_col,
+                                       ushort level, size_type sub_size,
+                                       k2_raster &k2_raster_1, k2_raster &k2_raster_2,
+                                       k2raster_submatrix<value_type> &node1, k2raster_submatrix<value_type> &node2,
+                                       std::vector<size_type> &last_access1, std::vector<size_type> &last_access2,
+                                       const OperationRaster &operation) {
+
+
+            min_value = std::numeric_limits<value_type>::max();
+            max_value = std::numeric_limits<value_type>::min();
+
+            // Calculate parameters for the current level.
+            ushort k = this->get_k(level);
+            sub_size = sub_size / k;
+
+            // ------------------------------------------------------------------- //
+            // If both nodes are uniforms, the new node is also uniform
+            // ------------------------------------------------------------------- //
+            if (node1.is_uniform && node2.is_uniform) {
+
+                // Run operation
+                switch (operation) {
+                    case OPERATION_SUM:
+                        max_value = node1.max_value + node2.max_value;
+                        break;
+                    case OPERATION_SUBT:
+                        max_value = node1.max_value - node2.max_value;
+                        break;
+                    case OPERATION_MULT:
+                        max_value = node1.max_value * node2.max_value;
+                        break;
+                    default:
+                        // No valid operation. The process never reaches this point
+                        exit(-1);
+                }
+                min_value = max_value; // Uniform node
+            } else {
+                /*****************/
+                /* INTERNAL NODE */
+                /*****************/
+                std::vector<value_type> min_values_children(k * k);
+                std::vector<value_type> max_values_children(k * k);
+                k2raster_submatrix<value_type> child1, child2;
+                child1.level = node1.level + 1;
+                child2.level = node2.level + 1;
+
+                size_type child_base_row, child_base_col;
+
+                for (uint x = 0; x < k; x++) {
+                    child_base_row = base_row + x * sub_size;
+                    for (uint y = 0; y < k; y++) {
+                        child_base_col = base_col + y * sub_size;
+
+                        if (child_base_row < this->k_real_size_x && child_base_col < this->k_real_size_y) {
+
+                            k2_raster_1.get_next_child(node1, child1, last_access1);
+                            k2_raster_2.get_next_child(node2, child2, last_access2);
+
+                            check_submatrix_operation_opt_mem(min_values_, max_values_, tmp_t_,
+                                                              n_min_values, n_max_values,
+                                                      min_values_children[x * k + y], max_values_children[x * k + y],
+                                                      child_base_row, child_base_col, level + 1, sub_size,
+                                                      k2_raster_1, k2_raster_2, child1, child2 ,
+                                                      last_access1, last_access2, operation);
+
+                            // Calculate min/max value of the parent node (current node)
+                            if (min_values_children[x * k + y] < min_value) {
+                                min_value = min_values_children[x * k + y];
+                            }
+                            if (max_values_children[x * k + y] > max_value) {
+                                max_value = max_values_children[x * k + y];
+                            }
+                        } else {
+                            // More children in raster1? Reset last_access1
+                            if (child_base_row < k2_raster_1.k_real_size_x && child_base_col < k2_raster_1.k_real_size_y) {
+                                for (size_t l = child1.level-1; l < last_access1.size(); l++) {
+                                    last_access1[l] = 0;
+                                }
+                            }
+
+                            // More children in raster2? Reset last_access2
+                            if (child_base_row < k2_raster_2.k_real_size_x && child_base_col < k2_raster_2.k_real_size_y) {
+                                for (size_t l = child2.level-1; l < last_access2.size(); l++) {
+                                    last_access2[l] = 0;
+                                }
+                            }
+
+                            // Positions out of real matrix
+                            min_values_children[x * k + y] = std::numeric_limits<value_type>::max();
+                            max_values_children[x * k + y] = std::numeric_limits<value_type>::min();
+                        }// ENF IF within real matrix
+
+                        node1.children_pos++;
+                        node2.children_pos++;
+                    } // END for y
+                } // END for x
+
+                // Check if matrix is not empty or uniform
+                if (min_value < max_value) {
+                    insert_node_conceptual_tree_opt_mem(min_values_, max_values_, tmp_t_,
+                                                        n_min_values[level], n_max_values[level],
+                                                min_values_children, max_values_children,
+                                                min_value, max_value, level, k);
+                } // END IF (min_value < max_value)
+            } // END IF leaf-internal node
+        }
+
+        //*****************************//
+        //******* Thresholding ********//
+        //*****************************//
+        void build_operation_thresholding(k2_raster &k2_raster_1, const value_type threshold){
+
+            // ------------------------------------------------------------------- //
+            // Initialize temporal structure where store max a min values and
+            // the topology of the tree
+            // ------------------------------------------------------------------- /
+            std::vector<std::vector<value_type>> min_values_(this->k_height);
+            std::vector<std::vector<value_type>> max_values_(this->k_height);
+            std::vector<sdsl::int_vector<1>> tmp_t_(this->k_height-1);
+
+            // ------------------------------------------------------------------- //
+            // Run the algorithm of construction over the matrix
+            // Return the conceptual tree that represent the k2-raster
+            // ------------------------------------------------------------------- //
+            k2raster_node<value_type> node1 = k2_raster_1.get_root();
+
+            std::vector<size_type> last_access1(k2_raster_1.k_accum_min_values);
+
+            check_submatrix_operation(threshold, min_values_, max_values_, tmp_t_,
+                                      this->k_min_value, this->k_max_value,
+                                      0, 0, 0, this->k_size,
+                                      k2_raster_1, node1, last_access1);
+
+
+            // ------------------------------------------------------------------- //
+            // Encode the conceptual tree
+            // ------------------------------------------------------------------- //
+            encode_conceptual_tree(max_values_, min_values_, tmp_t_);
+        }
+
+        void check_submatrix_operation(const value_type threshold, std::vector<std::vector<value_type>> &min_values_, std::vector<std::vector<value_type>> &max_values_, std::vector<sdsl::int_vector<1>> &tmp_t_,
+                                       value_type &min_value, value_type &max_value, size_type base_row, size_type base_col,
+                                       ushort level, size_type sub_size,
+                                       k2_raster &k2_raster_1, k2raster_node<value_type> &node1, std::vector<size_type> &last_access1) {
+
+            min_value = std::numeric_limits<value_type>::max();
+            max_value = std::numeric_limits<value_type>::min();
+
+            // Calculate parameters for the current level.
+            ushort k = this->get_k(level);
+            sub_size = sub_size / k;
+
+            // ------------------------------------------------------------------- //
+            // If both nodes are uniforms, the new node is also uniform
+            // ------------------------------------------------------------------- //
+            if (node1.min_value == node1.max_value ||
+                    node1.max_value < threshold || node1.min_value >= threshold) {
+
+                // Run operation
+                max_value = node1.max_value >= threshold ? 1 : 0;
+                min_value = max_value; // Uniform node
+            } else {
+                /*****************/
+                /* INTERNAL NODE */
+                /*****************/
+                std::vector<value_type> min_values_children(k * k);
+                std::vector<value_type> max_values_children(k * k);
+                k2raster_node<value_type> child1;
+                child1.level = node1.level + 1;
+
+                size_type child_base_row, child_base_col;
+
+                for (uint x = 0; x < k; x++) {
+                    child_base_row = base_row + x * sub_size;
+                    for (uint y = 0; y < k; y++) {
+                        child_base_col = base_col + y * sub_size;
+
+                        if (child_base_row < this->k_real_size_x && child_base_col < this->k_real_size_y) {
+
+                            child1 = k2_raster_1.get_child(node1, x * k + y);
+
+                            check_submatrix_operation(threshold, min_values_, max_values_, tmp_t_,
+                                                      min_values_children[x * k + y], max_values_children[x * k + y],
+                                                      child_base_row, child_base_col, level + 1, sub_size,
+                                                      k2_raster_1, child1, last_access1);
+
+                            // Calculate min/max value of the parent node (current node)
+                            if (min_values_children[x * k + y] < min_value) {
+                                min_value = min_values_children[x * k + y];
+                            }
+                            if (max_values_children[x * k + y] > max_value) {
+                                max_value = max_values_children[x * k + y];
+                            }
+                        } else {
+                            // More children in raster1? Reset last_access1
+                            //if (child_base_row < k2_raster_1.k_real_size_x && child_base_col < k2_raster_1.k_real_size_y) {
+                            //    for (size_t l = child1.level-1; l < last_access1.size(); l++) {
+                            //        last_access1[l] = 0;
+                            //    }
+                            //}
+                            // Positions out of real matrix
+                            min_values_children[x * k + y] = std::numeric_limits<value_type>::max();
+                            max_values_children[x * k + y] = std::numeric_limits<value_type>::min();
+                        }// ENF IF within real matrix
+
+                        //node1.children_pos++;
+                    } // END for y
+                } // END for x
+
+                // Check if matrix is not empty or uniform
+                if (min_value < max_value) {
+                    insert_node_conceptual_tree(min_values_, max_values_, tmp_t_,
+                                                min_values_children, max_values_children,
+                                                min_value, max_value, level, k);
+
+                } // END IF (min_value < max_value)
+            } // END IF leaf-internal node
+        }
+
+        //*****************************//
+        //*********** Scalar **********//
+        //*****************************//
+        void build_operation_scalar(k2_raster &k2_raster_1, const value_type scalar, const OperationRaster &operation){
+
+            value_type min_value = k2_raster_1.min_value;
+            value_type max_value = k2_raster_1.max_value;
+            // Run operation
+            switch (operation) {
+                case OPERATION_SUM:
+                    this->copy(k2_raster_1);
+                    this->k_min_value = min_value + scalar;
+                    this->k_max_value = max_value + scalar;
+                    break;
+                case OPERATION_SUBT:
+                    this->copy(k2_raster_1);
+                    this->k_min_value = min_value - scalar;
+                    this->k_max_value = max_value - scalar;
+                    break;
+                case OPERATION_MULT:
+                    this->copy_topology(k2_raster_1);
+
+                    // ------------------------------------------------------------------- //
+                    // Encode min/max values
+                    // ------------------------------------------------------------------- //
+
+                    // global Min-Max values
+                    this->k_min_value = min_value * scalar;
+                    this->k_max_value = max_value * scalar;
+
+
+                    std::vector<std::vector<value_type>> values_(this->k_height);
+                    ushort level = 0;
+                    // ---------------- //
+                    // Min values       //
+                    // ---------------- //
+                    for (auto &values_level : k2_raster_1.k_list_min) {
+                        //values_[level].push_back(values_level.access(0) * scalar);
+                        values_[level].resize(values_level.size());
+                        for (size_t p = 0; p < values_level.size(); p++) {
+                            values_[level][p] = values_level.next() * scalar;
+                        }
+                        level++;
+                    }
+
+                    // Encode min values
+                    this->build_min_values(values_);
+                    level = 0;
+
+                    // ---------------- //
+                    // Max values       //
+                    // ---------------- //
+                    values_.resize(k2_raster_1.k_list_max.size());
+                    for (auto &values_level : k2_raster_1.k_list_max) {
+                        values_[level].resize(values_level.size());
+                        for (size_t p = 0; p < values_level.size(); p++) {
+                            values_[level][p] = values_level.next() * scalar;
+                        }
+                        level++;
+                    }
+
+                    // Encode min values
+                    this->build_max_values(values_);
+                    values_.clear();
+                    values_.shrink_to_fit();
+
+                    /*// ---------------- //
+                    // Max values       //
+                    // ---------------- //
+                    values_.resize(k2_raster_1.k_list_max.size());
+                    for (const auto &values_level : k2_raster_1.k_list_max) {
+                        for (auto value : values_level) {
+                            values_[level].push_back(value * scalar);
+                        }
+                        level++;
+                    }
+
+                    // Encode max values;
+                    size_type n_nodes = this->build_max_values(values_);
+                    values_.clear();
+                    values_.shrink_to_fit();*/
+                    break;
+                //default:
+                //    // No valid operation. The process never reaches this point
+                //    exit(-1);
+            }
+        }
+
+        //*****************************//
+        //****** Zonal Operation ******//
+        //*****************************//
+        void build_operation_zonal(k2_raster &k2_raster_1, k2_raster &raster_zonal, const OperationZonalRaster &operation){
+
+            // Hash to store the sum of value for each zone
+            std::map<value_type, value_type> zonal_sum;
+
+            // ------------------------------------------------------------------- //
+            // Run the algorithm of construction over the matrix
+            // Return the conceptual tree that represent the k2-raster
+            // ------------------------------------------------------------------- //
+            {
+                k2raster_submatrix<value_type> node1{k2_raster_1.max_value == k2_raster_1.min_value,
+                                                     k2_raster_1.max_value, 0, 0};
+                k2raster_submatrix<value_type> node2{raster_zonal.max_value == raster_zonal.min_value,
+                                                     raster_zonal.max_value, 0, 0};
+
+                std::vector<size_type> last_access1(k2_raster_1.k_accum_min_values);
+                std::vector<size_type> last_access2(raster_zonal.k_accum_min_values);
+
+                calculate_operation_zonal(0, 0, 0, this->k_size,
+                                          k2_raster_1, raster_zonal, node1, node2,
+                                          last_access1, last_access2,
+                                          operation, zonal_sum);
+            } // END BLOCK map calculation
+
+            // ------------------------------------------------------------------- //
+            // Initialize temporal structure where store max a min values and
+            // the topology of the tree
+            // ------------------------------------------------------------------- /
+            std::vector<std::vector<value_type>> min_values_(this->k_height);
+            std::vector<std::vector<value_type>> max_values_(this->k_height);
+            std::vector<sdsl::int_vector<1>> tmp_t_(this->k_height-1);
+
+            // ------------------------------------------------------------------- //
+            // Run the algorithm of construction over the matrix
+            // Return the conceptual tree that represent the k2-raster
+            // ------------------------------------------------------------------- //
+            k2raster_submatrix<value_type> node_z {raster_zonal.max_value == raster_zonal.min_value, raster_zonal.max_value, 0, 0};
+            std::vector<size_type> last_access_z(raster_zonal.k_accum_min_values);
+
+            create_zonal_raster(min_values_, max_values_, tmp_t_,
+                                this->k_min_value, this->k_max_value,
+                                0, 0, 0, this->k_size,
+                                raster_zonal, node_z, last_access_z, zonal_sum);
+
+            // ------------------------------------------------------------------- //
+            // Encode the conceptual tree
+            // ------------------------------------------------------------------- //
+            encode_conceptual_tree(max_values_, min_values_, tmp_t_);
+        }
+
+        void build_operation_zonal_op(k2_raster &k2_raster_1, k2_raster &raster_zonal, const OperationZonalRaster &operation){
+
+            // Hash to store the sum of value for each zone
+            std::map<value_type, value_type> zonal_sum;
+            std::vector<std::vector<std::pair<uint8_t, value_type>>> queue_nodes(raster_zonal.k_list_max.size());
+            // Type format <node_type, max_value>
+            // Types:
+            //  - 0 -> No uniform node
+            //  - 1 -> Uniform node
+            //  - 2 -> Node out of real limits.
+            std::vector<std::vector<size_type>> parent_nodes(raster_zonal.k_list_max.size()-1);
+
+            // Reserve memory
+            for (size_type l = 0; l < raster_zonal.k_list_max.size(); l++) {
+                queue_nodes[l].reserve(raster_zonal.k_list_max[l].size());      // Possible number of 'nodes' per level.
+                if (l != raster_zonal.k_list_max.size()-1) {
+                    parent_nodes[l].reserve(raster_zonal.k_list_min[l].size()); // Possible number of 'parents' per level.
+                }
+            }
+
+            // ------------------------------------------------------------------- //
+            // Run the algorithm of construction over the matrix
+            // Return the conceptual tree that represent the k2-raster
+            // ------------------------------------------------------------------- //
+            {
+                k2raster_submatrix<value_type> node1{k2_raster_1.max_value == k2_raster_1.min_value,
+                                                     k2_raster_1.max_value, 0, 0};
+                k2raster_submatrix<value_type> node2{raster_zonal.max_value == raster_zonal.min_value,
+                                                     raster_zonal.max_value, 0, 0};
+
+                std::vector<size_type> last_access1(k2_raster_1.k_accum_min_values);
+                std::vector<size_type> last_access2(raster_zonal.k_accum_min_values);
+
+                calculate_operation_zonal_op(0, 0, 0, this->k_size,
+                                             k2_raster_1, raster_zonal, node1, node2,
+                                             last_access1, last_access2,
+                                             operation, zonal_sum, queue_nodes, parent_nodes);
+
+            } // END BLOCK map calculation
+
+            // ------------------------------------------------------------------- //
+            // Initialize temporal structure where store max a min values and
+            // the topology of the tree
+            // ------------------------------------------------------------------- /
+            std::vector<std::vector<value_type>> min_values_(this->k_height);
+            std::vector<std::vector<value_type>> max_values_(this->k_height);
+            std::vector<sdsl::int_vector<1>> tmp_t_(this->k_height-1);
+
+            // Reserve memory
+            for (size_type l = 0; l < raster_zonal.k_list_max.size(); l++) {
+                max_values_[l].reserve(queue_nodes[l].size());
+                if (l != raster_zonal.k_list_max.size()-1) {
+                    min_values_[l].reserve(parent_nodes[l].size());
+                }
+            }
+
+            // ------------------------------------------------------------------- //
+            // Run the algorithm of construction over the matrix
+            // Return the conceptual tree that represent the k2-raster
+            // ------------------------------------------------------------------- //
+            create_zonal_raster_op(min_values_, max_values_, tmp_t_,
+                                   zonal_sum, queue_nodes, parent_nodes);
+
+
+            // Free memory
+            {
+                zonal_sum.clear();
+                queue_nodes.clear();
+                queue_nodes.shrink_to_fit();
+                parent_nodes.clear();
+                parent_nodes.shrink_to_fit();
+
+                for (size_type l = 0; l < min_values_.size(); l++) {
+                    min_values_[l].shrink_to_fit();
+                }
+
+                for (size_type l = 0; l < max_values_.size(); l++) {
+                    max_values_[l].shrink_to_fit();
+                }
+            } // END BLOCK free memory
+
+            // ------------------------------------------------------------------- //
+            // Encode the conceptual tree
+            // ------------------------------------------------------------------- //
+            encode_conceptual_tree(max_values_, min_values_, tmp_t_);
+        }
+
+//        void build_operation_zonal_op2(k2_raster &k2_raster_1, k2_raster &raster_zonal, const OperationZonalRaster &operation){
+//
+//            // Hash to store the sum of value for each zone
+//            std::map<value_type, value_type> zonal_sum;
+//            std::vector<std::vector<std::tuple<bool, value_type, value_type>>> queue_nodes(raster_zonal.k_list_max.size());
+//            std::vector<std::vector<size_type>> parent_nodes(raster_zonal.k_list_max.size());
+//
+//            for (size_type l = 0; l < raster_zonal.k_list_max.size(); l++) {
+//                queue_nodes[l].reserve(raster_zonal.k_list_max[l].size());
+//            }
+//
+//            // ------------------------------------------------------------------- //
+//            // Run the algorithm of construction over the matrix
+//            // Return the conceptual tree that represent the k2-raster
+//            // ------------------------------------------------------------------- //
+//            {
+//                k2raster_submatrix<value_type> node1{k2_raster_1.max_value == k2_raster_1.min_value,
+//                                                     k2_raster_1.max_value, 0, 0};
+//                k2raster_submatrix<value_type> node2{raster_zonal.max_value == raster_zonal.min_value,
+//                                                     raster_zonal.max_value, 0, 0};
+//
+//                std::vector<size_type> last_access1(k2_raster_1.k_accum_min_values);
+//                std::vector<size_type> last_access2(raster_zonal.k_accum_min_values);
+//
+//                calculate_operation_zonal_op2(0, 0, 0, this->k_size,
+//                                             k2_raster_1, raster_zonal, node1, node2,
+//                                             last_access1, last_access2,
+//                                             operation, zonal_sum, queue_nodes, parent_nodes);
+//            } // END BLOCK map calculation
+//
+//            // ------------------------------------------------------------------- //
+//            // Initialize temporal structure where store max a min values and
+//            // the topology of the tree
+//            // ------------------------------------------------------------------- /
+//            std::vector<std::vector<value_type>> min_values_(this->k_height);
+//            std::vector<std::vector<value_type>> max_values_(this->k_height);
+//            std::vector<sdsl::int_vector<1>> tmp_t_(this->k_height-1);
+//
+//            // ------------------------------------------------------------------- //
+//            // Run the algorithm of construction over the matrix
+//            // Return the conceptual tree that represent the k2-raster
+//            // ------------------------------------------------------------------- //
+//            create_zonal_raster_op2(min_values_, max_values_, tmp_t_,
+//                                   zonal_sum, queue_nodes, parent_nodes);
+//
+//            // ------------------------------------------------------------------- //
+//            // Encode the conceptual tree
+//            // ------------------------------------------------------------------- //
+//            encode_conceptual_tree(max_values_, min_values_, tmp_t_);
+//        }
+
+        void calculate_operation_zonal(size_type base_row, size_type base_col,
+                                       ushort level, size_type sub_size,
+                                       k2_raster &k2_raster_1, k2_raster &raster_zonal,
+                                       k2raster_submatrix<value_type> &node1, k2raster_submatrix<value_type> &nodeZ,
+                                       std::vector<size_type> &last_access1, std::vector<size_type> &last_access2,
+                                       const OperationZonalRaster &operation, std::map<value_type, value_type> &zonal_sum) {
+
+            // ------------------------------------------------------------------- //
+            // If both nodes are uniforms, the new node is also uniform
+            // ------------------------------------------------------------------- //
+            if (node1.is_uniform && nodeZ.is_uniform) {
+                size_type n_nodes = 1;
+                if (sub_size != 1) {
+                    size_t c_x = std::min(sub_size, this->k_real_size_x - base_row);
+                    size_t c_y = std::min(sub_size, this->k_real_size_y - base_col);
+                    n_nodes = c_x * c_y;
+                }
+                // Run operation
+                switch (operation) {
+                    case OPERATION_ZONAL_SUM:
+                        if (zonal_sum.find(nodeZ.max_value) == zonal_sum.end()) {
+                            zonal_sum[nodeZ.max_value] = node1.max_value * n_nodes;
+                        } else {
+                            zonal_sum[nodeZ.max_value] += node1.max_value * n_nodes;
+                        }
+                        break;
+                    default:
+                        // No valid operation. The process never reaches this point
+                        exit(-1);
+                }
+            } else {
+
+                // Calculate parameters for the current level.
+                ushort k = this->get_k(level);
+                sub_size = sub_size / k;
+
+                /*****************/
+                /* INTERNAL NODE */
+                /*****************/
+                k2raster_submatrix<value_type> child1, childZ;
+                child1.level = node1.level + 1;
+                childZ.level = nodeZ.level + 1;
+                size_type child_base_row, child_base_col;
+
+                for (uint x = 0; x < k; x++) {
+                    child_base_row = base_row + x * sub_size;
+                    for (uint y = 0; y < k; y++) {
+                        child_base_col = base_col + y * sub_size;
+
+                        if (child_base_row < this->k_real_size_x && child_base_col < this->k_real_size_y) {
+
+                            k2_raster_1.get_next_child(node1, child1, last_access1);
+                            raster_zonal.get_next_child(nodeZ, childZ, last_access2);
+
+                            calculate_operation_zonal(child_base_row, child_base_col, level + 1, sub_size,
+                                                      k2_raster_1, raster_zonal, child1, childZ,
+                                                      last_access1, last_access2, operation, zonal_sum);
+                        } else {
+                            // More children in raster1? Reset last_access1
+                            if (child_base_row < k2_raster_1.k_real_size_x && child_base_col < k2_raster_1.k_real_size_y) {
+                                for (size_t l = child1.level-1; l < last_access1.size(); l++) {
+                                    last_access1[l] = 0;
+                                }
+                            }
+
+                            // More children in raster2? Reset last_access2
+                            if (child_base_row < raster_zonal.k_real_size_x && child_base_col < raster_zonal.k_real_size_y) {
+                                for (size_t l = childZ.level-1; l < last_access2.size(); l++) {
+                                    last_access2[l] = 0;
+                                }
+                            }
+                        }// ENF IF within real matrix
+
+                        node1.children_pos++;
+                        nodeZ.children_pos++;
+                    } // END for y
+                } // END for x
+            } // END IF leaf-internal node
+        }
+
+        void calculate_operation_zonal_op(size_type base_row, size_type base_col,
+                                       ushort level, size_type sub_size,
+                                       k2_raster &k2_raster_1, k2_raster &raster_zonal,
+                                       k2raster_submatrix<value_type> &node1, k2raster_submatrix<value_type> &nodeZ,
+                                       std::vector<size_type> &last_access1, std::vector<size_type> &last_access2,
+                                       const OperationZonalRaster &operation, std::map<value_type, value_type> &zonal_sum,
+                                       std::vector<std::vector<std::pair<uint8_t, value_type>>> &queue_nodes,
+                                       std::vector<std::vector<size_type>> &parent_nodes) {
+
+            // ------------------------------------------------------------------- //
+            // If both nodes are uniforms, the new node is also uniform
+            // ------------------------------------------------------------------- //
+            if (node1.is_uniform && nodeZ.is_uniform) {
+                size_type n_cells = 1;
+                if (sub_size != 1) {
+                    // Calculate the number of cells in the node
+                    size_t c_x = std::min(sub_size, this->k_real_size_x - base_row);
+                    size_t c_y = std::min(sub_size, this->k_real_size_y - base_col);
+                    n_cells = c_x * c_y;
+                }
+                // Run operation
+                switch (operation) {
+                    case OPERATION_ZONAL_SUM:
+                        if (zonal_sum.find(nodeZ.max_value) == zonal_sum.end()) {
+                            zonal_sum[nodeZ.max_value] = node1.max_value * n_cells;
+                        } else {
+                            zonal_sum[nodeZ.max_value] += node1.max_value * n_cells;
+                        }
+                        break;
+                    default:
+                        // No valid operation. The process never reaches this point
+                        exit(-1);
+                }
+            } else {
+
+                // Calculate parameters for the current level.
+                ushort k = this->get_k(level);
+                sub_size = sub_size / k;
+
+                /*****************/
+                /* INTERNAL NODE */
+                /*****************/
+                k2raster_submatrix<value_type> child1, childZ;
+                child1.level = node1.level + 1;
+                childZ.level = nodeZ.level + 1;
+                size_type child_base_row, child_base_col;
+
+                for (uint x = 0; x < k; x++) {
+                    child_base_row = base_row + x * sub_size;
+                    for (uint y = 0; y < k; y++) {
+                        child_base_col = base_col + y * sub_size;
+
+                        if (child_base_row < this->k_real_size_x && child_base_col < this->k_real_size_y) {
+                            k2_raster_1.get_next_child(node1, child1, last_access1);
+
+                            if (!nodeZ.is_uniform) {
+                                raster_zonal.get_next_child(nodeZ, childZ, last_access2);
+                                queue_nodes[nodeZ.level].push_back({childZ.is_uniform, childZ.max_value});
+                                if (!childZ.is_uniform){
+                                    size_type pos = nodeZ.children_pos - raster_zonal.k_accum_max_values[nodeZ.level];
+                                    parent_nodes[nodeZ.level].push_back(pos);
+                                }
+                            } else {
+                                childZ = nodeZ;
+                            }
+
+                            calculate_operation_zonal_op(child_base_row, child_base_col, level + 1, sub_size,
+                                                      k2_raster_1, raster_zonal, child1, childZ,
+                                                      last_access1, last_access2, operation,
+                                                      zonal_sum, queue_nodes, parent_nodes);
+                        } else {
+                            if (!nodeZ.is_uniform) {
+                                // Add a fake node (out of real raster)
+                                queue_nodes[nodeZ.level].push_back({2, std::numeric_limits<value_type>::min()});
+                            }
+                            // More children in raster1? Reset last_access1 (especial case)
+                            if (child_base_row < k2_raster_1.k_real_size_x && child_base_col < k2_raster_1.k_real_size_y) {
+                                for (size_t l = child1.level-1; l < last_access1.size(); l++) {
+                                    last_access1[l] = 0;
+                                }
+                            }
+
+                            // More children in raster2? Reset last_access2 (especial case)
+                            if (child_base_row < raster_zonal.k_real_size_x && child_base_col < raster_zonal.k_real_size_y) {
+                                for (size_t l = childZ.level-1; l < last_access2.size(); l++) {
+                                    last_access2[l] = 0;
+                                }
+                            }
+                        }// ENF IF within real matrix
+
+                        node1.children_pos++;
+                        nodeZ.children_pos++;
+                    } // END for y
+                } // END for x
+            } // END IF leaf-internal node
+        }
+
+//        void calculate_operation_zonal_op2(size_type base_row, size_type base_col,
+//                                          ushort level, size_type sub_size,
+//                                          k2_raster &k2_raster_1, k2_raster &raster_zonal,
+//                                          k2raster_submatrix<value_type> &node1, k2raster_submatrix<value_type> &nodeZ,
+//                                          std::vector<size_type> &last_access1, std::vector<size_type> &last_access2,
+//                                          const OperationZonalRaster &operation, std::map<value_type, value_type> &zonal_sum,
+//                                          std::vector<std::vector<std::tuple<bool, value_type, value_type>>> &queue_nodes,
+//                                          std::vector<std::vector<size_type>> &parent_nodes) {
+//
+//            // ------------------------------------------------------------------- //
+//            // If both nodes are uniforms, the new node is also uniform
+//            // ------------------------------------------------------------------- //
+//            if (node1.is_uniform && nodeZ.is_uniform) {
+//                size_type n_nodes = 1;
+//                if (sub_size != 1) {
+//                    size_t c_x = std::min(sub_size, this->k_real_size_x - base_row);
+//                    size_t c_y = std::min(sub_size, this->k_real_size_y - base_col);
+//                    n_nodes = c_x * c_y;
+//                }
+//                // Run operation
+//                switch (operation) {
+//                    case OPERATION_ZONAL_SUM:
+//                        if (zonal_sum.find(nodeZ.max_value) == zonal_sum.end()) {
+//                            zonal_sum[nodeZ.max_value] = node1.max_value * n_nodes;
+//                        } else {
+//                            zonal_sum[nodeZ.max_value] += node1.max_value * n_nodes;
+//                        }
+//                        break;
+//                    default:
+//                        // No valid operation. The process never reaches this point
+//                        exit(-1);
+//                }
+//            } else {
+//
+//                // Calculate parameters for the current level.
+//                ushort k = this->get_k(level);
+//                sub_size = sub_size / k;
+//
+//                /*****************/
+//                /* INTERNAL NODE */
+//                /*****************/
+//                k2raster_submatrix<value_type> child1, childZ;
+//                child1.level = node1.level + 1;
+//                childZ.level = nodeZ.level + 1;
+//                size_type child_base_row, child_base_col;
+//
+//                for (uint x = 0; x < k; x++) {
+//                    child_base_row = base_row + x * sub_size;
+//                    for (uint y = 0; y < k; y++) {
+//                        child_base_col = base_col + y * sub_size;
+//
+//                        if (child_base_row < this->k_real_size_x && child_base_col < this->k_real_size_y) {
+//
+//                            k2_raster_1.get_next_child(node1, child1, last_access1);
+//
+//                            if (!nodeZ.is_uniform) {
+//                                raster_zonal.get_next_child(nodeZ, childZ, last_access2);
+//                                queue_nodes[nodeZ.level].push_back({childZ.is_uniform, childZ.max_value, childZ.max_value});
+//                                if (!childZ.is_uniform){
+//                                    size_type pos = nodeZ.children_pos - raster_zonal.k_accum_max_values[nodeZ.level];
+//                                    parent_nodes[nodeZ.level].push_back(pos); // TODO change this
+//                                }
+//                            } else {
+//                                childZ = nodeZ;
+//                            }
+//
+//                            calculate_operation_zonal_op2(child_base_row, child_base_col, level + 1, sub_size,
+//                                                         k2_raster_1, raster_zonal, child1, childZ,
+//                                                         last_access1, last_access2, operation,
+//                                                         zonal_sum, queue_nodes, parent_nodes);
+//                        } else {
+//                            if (!nodeZ.is_uniform) {
+//                                // Add a fake node (out of real raster)
+//                                queue_nodes[nodeZ.level].push_back({true,
+//                                                                    std::numeric_limits<value_type>::max(), std::numeric_limits<value_type>::min()});
+//                            }
+//                            // More children in raster1? Reset last_access1
+//                            if (child_base_row < k2_raster_1.k_real_size_x && child_base_col < k2_raster_1.k_real_size_y) {
+//                                for (size_t l = child1.level-1; l < last_access1.size(); l++) {
+//                                    last_access1[l] = 0;
+//                                }
+//                            }
+//
+//                            // More children in raster2? Reset last_access2
+//                            if (child_base_row < raster_zonal.k_real_size_x && child_base_col < raster_zonal.k_real_size_y) {
+//                                for (size_t l = childZ.level-1; l < last_access2.size(); l++) {
+//                                    last_access2[l] = 0;
+//                                }
+//                            }
+//                        }// ENF IF within real matrix
+//
+//                        node1.children_pos++;
+//                        nodeZ.children_pos++;
+//                    } // END for y
+//                } // END for x
+//            } // END IF leaf-internal node
+//        }
+
+        void create_zonal_raster(std::vector<std::vector<value_type>> &min_values_, std::vector<std::vector<value_type>> &max_values_, std::vector<sdsl::int_vector<1>> &tmp_t_,
+                                       value_type &min_value, value_type &max_value, size_type base_row, size_type base_col,
+                                       ushort level, size_type sub_size,
+                                       k2_raster &k2_raster_z, k2raster_submatrix<value_type> &node_z,
+                                       std::vector<size_type> &last_access_z, std::map<value_type, value_type> &zonal_sum) {
+
+            min_value = std::numeric_limits<value_type>::max();
+            max_value = std::numeric_limits<value_type>::min();
+
+            // Calculate parameters for the current level.
+            ushort k = this->get_k(level);
+            sub_size = sub_size / k;
+
+            // ------------------------------------------------------------------- //
+            // If both nodes are uniforms, the new node is also uniform
+            // ------------------------------------------------------------------- //
+            if (node_z.is_uniform) {
+                max_value = zonal_sum[node_z.max_value];
+                min_value = max_value; // Uniform node
+            } else {
+                /*****************/
+                /* INTERNAL NODE */
+                /*****************/
+                std::vector<value_type> min_values_children(k * k);
+                std::vector<value_type> max_values_children(k * k);
+                k2raster_submatrix<value_type> child_z;
+                child_z.level = node_z.level + 1;
+
+                size_type child_base_row, child_base_col;
+
+                for (uint x = 0; x < k; x++) {
+                    child_base_row = base_row + x * sub_size;
+                    for (uint y = 0; y < k; y++) {
+                        child_base_col = base_col + y * sub_size;
+
+                        if (child_base_row < this->k_real_size_x && child_base_col < this->k_real_size_y) {
+
+                            k2_raster_z.get_next_child(node_z, child_z, last_access_z);
+                            create_zonal_raster(min_values_, max_values_, tmp_t_,
+                                                min_values_children[x * k + y], max_values_children[x * k + y],
+                                                child_base_row, child_base_col, level + 1, sub_size,
+                                                k2_raster_z, child_z, last_access_z, zonal_sum);
+
+                            // Calculate min/max value of the parent node (current node)
+                            if (min_values_children[x * k + y] < min_value) {
+                                min_value = min_values_children[x * k + y];
+                            }
+                            if (max_values_children[x * k + y] > max_value) {
+                                max_value = max_values_children[x * k + y];
+                            }
+                        } else {
+                            // TODO remove this?
+                            // More children in raster1? Reset last_access1
+                            if (child_base_row < k2_raster_z.k_real_size_x && child_base_col < k2_raster_z.k_real_size_y) {
+                                for (size_t l = child_z.level-1; l < last_access_z.size(); l++) {
+                                    last_access_z[l] = 0;
+                                }
+                            }
+
+                            // Positions out of real matrix
+                            min_values_children[x * k + y] = std::numeric_limits<value_type>::max();
+                            max_values_children[x * k + y] = std::numeric_limits<value_type>::min();
+                        }// ENF IF within real matrix
+
+                        node_z.children_pos++;
+                    } // END for y
+                } // END for x
+
+                // Check if matrix is not empty or uniform
+                if (min_value < max_value) {
+                    insert_node_conceptual_tree(min_values_, max_values_, tmp_t_,
+                                                min_values_children, max_values_children,
+                                                min_value, max_value, level, k);
+
+                } // END IF (min_value < max_value)
+            } // END IF leaf-internal node
+        }
+
+        void create_zonal_raster_op(std::vector<std::vector<value_type>> &min_values_, std::vector<std::vector<value_type>> &max_values_,
+                                    std::vector<sdsl::int_vector<1>> &tmp_t_,
+                                    std::map<value_type, value_type> &zonal_sum,
+                                    std::vector<std::vector<std::pair<uint8_t, value_type>>> &queue_nodes,
+                                    std::vector<std::vector<size_type>> &parent_nodes) {
+
+            value_type min_value, max_value;
+            value_type max_value_node;
+            std::vector<value_type> min_values_children;
+            std::vector<value_type> max_values_children;
+            std::queue<value_type> min_values_parents;
+
+            for (short l = this->k_height-1; l >= 0; l--) {
+                ushort k = this->get_k(l);
+                min_values_children.resize(k * k);
+                max_values_children.resize(k * k);
+                size_type n_node = 0;
+                size_type n_parent = 0;
+
+                for (size_type n = 0; n < queue_nodes[l].size(); n += (k * k)) {
+                    min_value = std::numeric_limits<value_type>::max();
+                    max_value = std::numeric_limits<value_type>::min();
+
+                    for (ushort c = 0; c < k * k; c++) {
+                        //Read the next k nodes in the queue (they are children of the same parent)
+                        auto node = queue_nodes[l][n_node++]; // Get the next child of the current node
+                        max_value_node = node.second;
+
+                        switch (node.first) {
+                            case 0:
+                                // Interval node
+                                min_values_children[c] = min_values_parents.front();
+                                min_values_parents.pop();
+                                max_values_children[c] = max_value_node;
+                                break;
+                            case 1:
+                                // Leaf (uniform) node
+                                min_values_children[c] = zonal_sum[max_value_node];
+                                max_values_children[c] = zonal_sum[max_value_node];
+                                break;
+                            case 2:
+                                // Node out of real bounds (set min > max value)
+                                min_values_children[c] = 1;
+                                max_values_children[c] = 0;
+                                continue;
+                        }
+
+                        // Calculate min/max value of the parent node (current node)
+                        min_value = std::min(min_value, min_values_children[c]);
+                        max_value = std::max(max_value, max_values_children[c]);
+                    } // END FOR c
+
+                    if (min_value < max_value) {
+                        insert_node_conceptual_tree(min_values_, max_values_, tmp_t_,
+                                                    min_values_children, max_values_children,
+                                                    min_value, max_value, l, k);
+
+                    } // END IF (min_value < max_value)
+
+                    // Update father
+                    if (l != 0) {
+                        auto &parent = queue_nodes[l - 1][parent_nodes[l - 1][n_parent++]];
+                        parent.second = max_value;
+                        min_values_parents.push(min_value);
+                    } else {
+                        // Update root node
+                        this->k_min_value = min_value;
+                        this->k_max_value = max_value;
+                    }
+                } // END WHILE queue
+
+                // Free memory
+                if (l != 0) {
+                    parent_nodes[l - 1].clear();
+                    parent_nodes[l - 1].shrink_to_fit();
+                }
+                queue_nodes[l].clear();
+                queue_nodes[l].shrink_to_fit();
+            } // END FOR level l
+        }
+
+//        void create_zonal_raster_op2(std::vector<std::vector<value_type>> &min_values_, std::vector<std::vector<value_type>> &max_values_,
+//                                    std::vector<sdsl::int_vector<1>> &tmp_t_,
+//                                    std::map<value_type, value_type> &zonal_sum,
+//                                    std::vector<std::vector<std::tuple<bool, value_type, value_type>>> &queue_nodes,
+//                                    std::vector<std::vector<size_type>> &parent_nodes) {
+//
+//            value_type min_value, max_value;
+//            value_type min_value_node, max_value_node;
+//            std::vector<value_type> min_values_children;
+//            std::vector<value_type> max_values_children;
+//
+//            for (int l = this->k_height-1; l >= 0; l--) {
+//                ushort k = this->get_k(l);
+//                min_values_children.resize(k * k);
+//                max_values_children.resize(k * k);
+//                size_type n_parent = 0;
+//
+//                for (size_type n = 0; n < queue_nodes[l].size(); n += (k*k)) {
+//                    min_value = std::numeric_limits<value_type>::max();
+//                    max_value = std::numeric_limits<value_type>::min();
+//
+//                    for (ushort c = 0; c < k*k; c++) {
+//                        //Read the next k nodes in the queue (they are children of the same parent)
+//                        auto node = queue_nodes[l][n + c]; // Get the next child of the current node
+//                        min_value_node = std::get<1>(node);
+//                        max_value_node = std::get<2>(node);
+//
+//                        if (std::get<0>(node)){
+//                            // Uniform node in zonal raster (get corresponding hash value)
+//                            if ( min_value_node > max_value_node) {
+//                                // Node out of real bound
+//                                min_values_children[c] = min_value_node;
+//                                max_values_children[c] = max_value_node;
+//                                continue;
+//                            } else {
+//                                // Leaf node
+//                                min_values_children[c] = zonal_sum[min_value_node];
+//                                max_values_children[c] = zonal_sum[max_value_node];
+//                            }
+//                        } else {
+//                            // Interval node
+//                            min_values_children[c] = min_value_node;
+//                            max_values_children[c] = max_value_node;
+//                        }
+//
+//                        // Calculate min/max value of the parent node (current node)
+//                        min_value = std::min(min_value, min_values_children[c]);
+//                        max_value = std::max(max_value, max_values_children[c]);
+//                    } // END FOR c
+//
+//                    if (min_value < max_value) {
+//                        insert_node_conceptual_tree(min_values_, max_values_, tmp_t_,
+//                                                    min_values_children, max_values_children,
+//                                                    min_value, max_value, l, k);
+//
+//                    } // END IF (min_value < max_value)
+//
+//                    // Update father
+//                    if (l != 0) {
+//                        auto &parent = queue_nodes[l - 1][parent_nodes[l-1][n_parent++]];
+//                        std::get<1>(parent) = min_value;
+//                        std::get<2>(parent) = max_value;
+//                    } else {
+//                        // Update root node
+//                        this->k_min_value = min_value;
+//                        this->k_max_value = max_value;
+//                    }
+//                } // END WHILE queue
+//            } // END FOR level l
+//        }
 
         //*******************************************************//
         //**************** QUERIES HELPERS **********************//
@@ -472,7 +1905,7 @@ namespace k2raster {
                     } else {
                         if (!is_uniform) {
                             // Go down one level on the tree
-                            if (this->is_plain_level(level-1)) {
+                            if (this->is_plain_level(level)) {
                                 // Child is represented with plain values
                                 ones -= (this->k_accum_min_values[level-1]+1);
                                 count_cells += this->get_cells_by_value_plain(c_xini, c_xend, c_yini, c_yend, valini, valend,
@@ -537,16 +1970,16 @@ namespace k2raster {
                     is_uniform = is_leaf || !this->k_t[pos];
                     if (is_uniform) {
                         size_type cell_pos;
-                        for (auto x = c_xini; x <= c_xend; x++) {
-                            cell_pos = (x - or_x) * window_size + (c_yini - or_y);
-                            for (auto y = c_yini; y <= c_yend; y++) {
+                        for (auto dx = c_xini; dx <= c_xend; dx++) {
+                            cell_pos = (dx - or_x) * window_size + (c_yini - or_y);
+                            for (auto dy = c_yini; dy <= c_yend; dy++) {
                                 result[cell_pos++] = max_value;
                             } // END FOR y
                         } // END FOR x
                         count_cells += (c_xend-c_xini+1) * (c_yend-c_yini+1);
                         continue; // Go to next node
                     } else {
-                        if (this->is_plain_level(level-1)) {
+                        if (this->is_plain_level(level)) {
                             // Child is represented with plain values
                             size_type ones = (this->k_t_rank1(pos) + 1) - (this->k_accum_min_values[level-1]+1);
                             count_cells += this->get_values_window_plain(c_xini, c_xend, c_yini, c_yend,
@@ -649,7 +2082,7 @@ namespace k2raster {
                         // If it is uniform, the children has not children
                         if (!is_uniform) {
                             bool result;
-                            if (this->is_plain_level(level-1)) {
+                            if (this->is_plain_level(level)) {
                                 // Child is represented with plain values
                                 ones -= (this->k_accum_min_values[level-1]+1);
                                 result = this->check_values_window_plain(c_xini, c_xend, c_yini, c_yend, valini, valend,
@@ -675,7 +2108,72 @@ namespace k2raster {
             // (weak) No values found within the range of values
             return strong_check;
         }
+
+        //*****************************//
+        //***** DECOMPRESS HELPER *****//
+        //*****************************//
+        size_type decompress_helper(size_type base_x, size_type base_y, value_type f_max_value,
+                                           size_type children_pos, size_type children_size, ushort level,
+                                           std::vector<value_type> &result) {
+            size_type pos;
+            size_type c_base_x, c_base_y;
+            value_type max_value;
+
+            ushort k = this->get_k(level-1);                        // Current value of "k"
+            bool is_uniform, is_leaf = level == this->k_height;     // True -> They are leaves
+            size_type count_cells = 0;
+
+            // Check children
+            for (auto x = 0; x < k; x++) {
+                c_base_x = base_x + x * children_size;                                                  // Calculate base position of the current child (row)
+                if (c_base_x >= this->k_real_size_x) continue;
+                for (auto y = 0; y < k; y++) {
+                    pos = children_pos + x * k + y;                                                     // Get position at Tree (T)
+                    c_base_y = base_y + y * children_size;                                              // Calculate base position of the current child (column)
+                    if (c_base_y >= this->k_real_size_y) continue;
+
+                    max_value = f_max_value - this->get_max_value_op(level, pos);
+//                            this->k_list_max[level-1].access(pos - this->k_accum_max_values[level-1]);  // Get max value
+                    // Check if it is a uniform submatrix
+
+                    is_uniform = is_leaf || !this->k_t[pos];
+                    if (is_uniform) {
+
+                        // Calculate positions with overlap with the interesting region
+                        auto c_xend = std::min(c_base_x + children_size - 1, this->k_real_size_x-1);
+                        auto c_yend = std::min(c_base_y + children_size - 1, this->k_real_size_y-1);
+
+                        size_type cell_pos;
+                        for (auto dx = c_base_x; dx <= c_xend; dx++) {
+                            cell_pos = dx * this->k_real_size_y + c_base_y;
+                            for (auto dy = c_base_y; dy <= c_yend; dy++) {
+                                result[cell_pos++] = max_value;
+                            } // END FOR y
+                        } // END FOR x
+                        count_cells += (c_xend-c_base_x+1) * (c_yend-c_base_y+1);
+                        continue; // Go to next node
+                    } else {
+                        if (this->is_plain_level(level)) {
+                            // Child is represented with plain values
+                            size_type ones = (this->k_t_rank1(pos) + 1) - (this->k_accum_min_values[level-1]+1);
+                            count_cells += this->decompress_plain(children_size, ones * children_size* children_size,
+                                                                         max_value, result);
+                        } else {
+                            // Go down one level on the tree
+                            size_type new_children_pos = this->get_children_position(pos, level);
+                            count_cells += decompress_helper(c_base_x, c_base_y, max_value, new_children_pos,
+                                                             children_size / this->get_k(level), level + 1, result);
+                        }
+                    } // END IF is_uniform
+                } // END FOR y
+            } // END FOR x
+            return count_cells;
+        }
+
+
+
+
     };
 } // END NAMESPACE k2raster
 
-#endif // INCLUDED_K2_RASTER_BASE
+#endif // INCLUDED_K2_RASTER_

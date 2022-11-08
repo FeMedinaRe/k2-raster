@@ -54,7 +54,7 @@ uint levels_k1 = 4;
 uint plain_levels = 2;
 size_t snap_freq = 4;
 size_t scale_factor =0;
-uint n_random_queries = 100;
+size_t n_random_queries = 100;
 
 // Random number generator
 std::random_device rd;  //Will be used to obtain a seed for the random number engine
@@ -109,7 +109,7 @@ TYPED_TEST(test_t_k2_raster, QueryGet){
     output_file.close();
 
     // Get 'n_random_queries' positions
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (size_t n = 0; n < n_random_queries; n++) {
         auto row = dis_row(gen);
         auto col = dis_col(gen);
         auto t = dis_time(gen);
@@ -138,7 +138,7 @@ TYPED_TEST(test_t_k2_raster, QueryGetCellsByValue){
     output_file.close();
 
     // Run 'n_random_queries' queries
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (size_t n = 0; n < n_random_queries; n++) {
         auto xini = dis_row(gen);
         auto yini = dis_col(gen);
         auto tini = dis_time(gen);
@@ -190,7 +190,7 @@ TYPED_TEST(test_t_k2_raster, QueryGetValuesWindow){
     output_file.close();
 
     // Run 'n_random_queries' queries
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (size_t n = 0; n < n_random_queries; n++) {
         auto xini = dis_row(gen);
         auto yini = dis_col(gen);
         auto tini = dis_time(gen);
@@ -226,7 +226,7 @@ TYPED_TEST(test_t_k2_raster, QueryCheckValuesWindowStrong){
     output_file.close();
 
     // Run 'n_random_queries' queries
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (size_t n = 0; n < n_random_queries; n++) {
         auto xini = dis_row(gen);
         auto yini = dis_col(gen);
         auto tini = dis_time(gen);
@@ -272,7 +272,7 @@ TYPED_TEST(test_t_k2_raster, QueryCheckValuesWindowWeak){
     output_file.close();
 
     // Run 'n_random_queries' queries
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (size_t n = 0; n < n_random_queries; n++) {
         auto xini = dis_row(gen);
         auto yini = dis_col(gen);
         auto tini = dis_time(gen);

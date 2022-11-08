@@ -26,19 +26,13 @@
  */
 
 #include <k2_raster.hpp>
+#include <k2_raster_heuristic.hpp>
 #include <utils/query/query.hpp>
 #include <utils/utils_time.hpp>
-#include <k2_raster_heuristic.hpp>
-
-#define NREPS 1
-
-void print_help(char * argv0) {
-    printf("Usage: %s <k2_raster_file> <query_file> <strong_check> <check>\n", argv0);
-}
-
+#include <utils/args/utils_args_raster.hpp>
 
 template<typename k2_raster_type>
-void run_queries(std::string k2raster_filename, std::string query_filename, bool strong_check, bool set_check) {
+void run_queries(std::string k2raster_filename, const std::string &query_filename, bool strong_check, bool set_check, uint n_reps=1) {
 
     /*********************/
     /* Read queries      */
@@ -65,7 +59,7 @@ void run_queries(std::string k2raster_filename, std::string query_filename, bool
     auto t1 = util::time::user::now(); // Start time
     size_t n_queries_true = 0;
 
-    for (uint r = 0; r < NREPS; r++) {
+    for (uint r = 0; r < n_reps; r++) {
 #ifndef NDEBUG
         size_t q = 0;
 #endif
@@ -88,15 +82,14 @@ void run_queries(std::string k2raster_filename, std::string query_filename, bool
                     for (auto y = query.yini; y <= query.yend; y++) {
                         value = k2_raster.get_cell(x, y);
                         if (value >= query.valini &&  value <= query.valend) {
-                            if (!strong_check) {
-                                query_OK = true;
-                                break;
-                            }
-
                             if (!strong_check && !result) {
                                 std::cout << "[ERROR] Cell (" << x << ", " << y << ") ";
                                 std::cout << " expected " << value << std::endl;
                                 exit(-1);
+                            }
+                            if (!strong_check) {
+                                query_OK = true;
+                                break;
                             }
                         } else {
                             if (strong_check) {
@@ -121,54 +114,40 @@ void run_queries(std::string k2raster_filename, std::string query_filename, bool
     { // Print Info
         auto time = util::time::duration_cast<util::time::milliseconds>(t2-t1);
         std::cout << "Time: " << time << " milliseconds. ";
-        std::cout << "Queries: " << NREPS * queries.size() << " (" << NREPS << "x" << queries.size() << ") ";
-        std::cout << "Result: true = " << n_queries_true << ", false = " << NREPS * queries.size() - n_queries_true << ", ";
-        std::cout << "us/query = " << ((time * 1000.0)/(NREPS*queries.size())) << std::endl;
+        std::cout << "Queries: " << n_reps * queries.size() << " (" << n_reps << "x" << queries.size() << ") ";
+        std::cout << "Result: true = " << n_queries_true << ", false = " << n_reps * queries.size() - n_queries_true << ", ";
+        std::cout << "us/query = " << ((time * 1000.0)/(double)(n_reps*queries.size())) << std::endl;
     }
 }
 
 int main(int argc, char **argv) {
 
-    if (argc != 5) {
-        print_help(argv[0]);
-        exit(-1);
-    }
-
     /*********************/
     /* Reads params      */
     /*********************/
-    std::string k2raster_filename = argv[1];
-    std::string query_filename = argv[2];
-    bool strong_check = atoi(argv[3]);
-    bool set_check = atoi(argv[3]);
+    args_check_values args;
+    parse_args_check_values(argc, argv, args);
 
     /*********************/
     /*k2-raster Type     */
     /*********************/
-    // Load structure
-    std::ifstream k2raster_file(k2raster_filename);
-    assert(k2raster_file.is_open() && k2raster_file.good());
-
-    ushort k2_raster_type;
-    sdsl::read_member(k2_raster_type, k2raster_file);
-    k2raster_file.close();
-
+    ushort k2_raster_type = k2raster::get_type(args.input_file);
 
     /*********************/
     /* Run queries       */
     /*********************/
     switch (k2_raster_type) {
         case k2raster::K2_RASTER_TYPE:
-            run_queries<k2raster::k2_raster<>>(k2raster_filename, query_filename, strong_check, set_check);
+            run_queries<k2raster::k2_raster<>>(args.input_file, args.query_file, args.strong_check, args.set_check, args.n_reps);
             break;
         case k2raster::K2_RASTER_TYPE_PLAIN:
-            run_queries<k2raster::k2_raster_plain<>>(k2raster_filename, query_filename, strong_check, set_check);
+            run_queries<k2raster::k2_raster_plain<>>(args.input_file, args.query_file, args.strong_check, args.set_check, args.n_reps);
             break;
         case k2raster::K2_RASTER_TYPE_HEURISTIC:
-            run_queries<k2raster::k2_raster_heuristic<>>(k2raster_filename, query_filename, strong_check, set_check);
+            run_queries<k2raster::k2_raster_heuristic<>>(args.input_file, args.query_file, args.strong_check, args.set_check, args.n_reps);
             break;
         default:
-            print_help(argv[0]);
+            print_usage_check_values(argv);
             std::cout << "Invalid k2-raster type " << k2_raster_type << ": " << std::endl;
             std::cout << "\t Type " << k2raster::K2_RASTER_TYPE << ": hybrid k2-raster." << std::endl;
             std::cout << "\t Type " << k2raster::K2_RASTER_TYPE_PLAIN << ": k2-raster with plain values." << std::endl;

@@ -710,13 +710,13 @@ protected:
                     if (c_has_children || !c_is_uniform_snap) {
                         // Go down one level on the tree
 
-                        if (has_children && (!c_has_children || this->is_plain_level(l-1))) {
+                        if (has_children && (!c_has_children || this->is_plain_level(l))) {
                             // We reach a leaf in 'log'. Apply the differences permanently
                             max_snap += diff_max;
                             min_snap += diff_min;
                         }
 
-                        if (this->is_plain_level(l-1)) {
+                        if (this->is_plain_level(l)) {
                             // Get value from plain values
                             if (c_has_children) {
                                 // Check plain values at log
@@ -833,12 +833,12 @@ protected:
                     }
                 } else {
                     // Go down one level on the tree
-                    if ((has_children && !c_has_children) || this->is_plain_level(l-1)) {
+                    if ((has_children && !c_has_children) || this->is_plain_level(l)) {
                         // We reach a leaf in 'log'. Apply the differences permanently
                         max_snap += diff_max;
                     }
 
-                    if (this->is_plain_level(l-1)) {
+                    if (this->is_plain_level(l)) {
                         // Get value from plain values
                         size_type ones;
                         if (c_has_children) {
@@ -997,14 +997,14 @@ protected:
                         return !strong_check;
                     } else {
                         // Go down one level on the tree
-                        if (has_children && (!c_has_children || this->is_plain_level(l-1))) {
+                        if (has_children && (!c_has_children || this->is_plain_level(l))) {
                             // We reach a leaf in 'log'. Apply the differences permanently
                             max_snap += diff_max;
                             min_snap += diff_min;
                         }
 
                         bool result;
-                        if (this->is_plain_level(l-1)) {
+                        if (this->is_plain_level(l)) {
                             // Get value from plain values
 //                            size_type ones;
                             if (c_has_children) {

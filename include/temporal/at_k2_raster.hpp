@@ -533,6 +533,6 @@ protected:
     typedef k2raster::at_k2_raster<> atk2r_type;
     typedef k2raster::at_k2_raster<int, k2_raster_heuristic<>, t_k2_raster_heuristic_log<>> athk2r_type;
     typedef k2raster::at_k2_raster<int, k2_raster_plain<>, t_k2_raster_plain_log<>> atpk2r_type;
-} // END namespacek2raster
+} // END namespace k2raster
 
-#endif // INCLUDED_T_K2_RASTER
+#endif // INCLUDED_AT_K2_RASTER

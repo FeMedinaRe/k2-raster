@@ -28,11 +28,12 @@
 #ifndef INCLUDE_UTILS_UTILS_DATA
 #define INCLUDE_UTILS_UTILS_DATA
 
-//! Namespace for k2-raster library
+// System libraries
 #include <vector>
 #include <cstdio>
 #include <random>
 
+//! Namespace for k2-raster library
 namespace k2raster {
 
     //*******************************************************//

@@ -25,8 +25,8 @@
  *
  */
 
-#ifndef SDSL_K2_RASTER_UTILS_HEURISTIC
-#define SDSL_K2_RASTER_UTILS_HEURISTIC
+#ifndef K2_RASTER_UTILS_HEURISTIC
+#define K2_RASTER_UTILS_HEURISTIC
 
 // System libraries
 #include <cstdio>
@@ -219,4 +219,4 @@ namespace k2raster_heuristic {
 
 }; // END NAMESPACE sdsl_heuristic
 
-#endif // SDSL_K2_RASTER_UTILS_HEURISTIC
+#endif // K2_RASTER_UTILS_HEURISTIC

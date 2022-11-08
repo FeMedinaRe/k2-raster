@@ -1,14 +1,46 @@
-cmake_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 2.8.12)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
 include(AppendCompilerFlags)
 
-project(k2-raster_sdsl)
+project(k2-raster)
 set(PROJECT_VENDOR "Fernando Silva-Coira")
-set(CMAKE_PROJECT_NAME "k2-raster_sdsl")
+set(CMAKE_PROJECT_NAME "k2-raster")
 set(PROJECT_CONTACT "fernando.silva@udc.es")
 
-set(CMAKE_BUILD_TYPE "Release")
+# Change to Debug or Relase
+set(CMAKE_BUILD_TYPE "Debug")
 
+#############
+# Version   #
+#############
+# Set project version
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" PROJECT_VERSION_FULL)
+string(REGEX REPLACE "[\n\r]" "" PROJECT_VERSION_FULL "${PROJECT_VERSION_FULL}")
+string(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+$" "\\1" PROJECT_VERSION_MAJOR "${PROJECT_VERSION_FULL}")
+string(REGEX REPLACE "^[0-9]+\\.([0-9]+)\\.[0-9]+$" "\\1" PROJECT_VERSION_MINOR "${PROJECT_VERSION_FULL}")
+string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+)$" "\\1" PROJECT_VERSION_PATCH "${PROJECT_VERSION_FULL}")
+set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+math(EXPR LIBRARY_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+set(LIBRARY_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+set(LIBRARY_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+set(LIBRARY_VERSION "${LIBRARY_VERSION_MAJOR}.${LIBRARY_VERSION_MINOR}")
+set(LIBRARY_VERSION_FULL "${LIBRARY_VERSION}.${LIBRARY_VERSION_PATCH}")
+
+if (CMAKE_VERSION VERSION_LESS 3.0)
+    PROJECT(k2-raster CXX)
+    set(PROJECT_VERSION_MAJOR "${LIBRARY_VERSION_MAJOR}")
+    set(PROJECT_VERSION_MINOR "${LIBRARY_VERSION_MINOR}")
+    set(PROJECT_VERSION_PATCH"${LIBRARY_VERSION_PATCH}")
+    set(PROJECT_VERSION "${LIBRARY_VERSION_FULL}")
+else()
+    message("${LIB_VERSION_STRING}")
+    cmake_policy(SET CMP0048 NEW)
+    PROJECT(k2-raster VERSION "${LIBRARY_VERSION_FULL}" LANGUAGES CXX)
+endif()
+
+#############
+# Folders   #
+#############
 # Set output folder
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -49,6 +81,7 @@ else()
 endif()
 
 add_subdirectory(external/sdsl-lite)
+add_subdirectory(external/malloc_count)
 
 include_directories("${PROJECT_SOURCE_DIR}/external/sdsl-lite/external/googletest/include"
         ${CMAKE_HOME_DIRECTORY}/include
@@ -56,6 +89,7 @@ include_directories("${PROJECT_SOURCE_DIR}/external/sdsl-lite/external/googletes
         ${CMAKE_BINARY_DIR}/external/sdsl-lite/external/libdivsufsort/include/
         ${CMAKE_HOME_DIRECTORY}//external/sdsl-lite/external/googletest/include
         ${CMAKE_HOME_DIRECTORY}/external/sdsl-lite/external/FastPFor/headers/
+        ${CMAKE_HOME_DIRECTORY}/external/malloc_count/include
         ${STXXL_INCLUDE_DIRS}
         )
 
@@ -80,10 +114,16 @@ set(SOURCES
         include/utils/dac_vector.hpp
         include/utils/utils_data.hpp
         include/utils/utils_time.hpp
+        #include/utils/utils_memory.hpp
+        include/utils/args/utils_args_raster.hpp
+        include/utils/args/utils_args_raster_temporal.hpp
+        include/utils/args/utils_args_algebra.hpp
+        include/utils/args/utils_args_utils.hpp
         )
 
-
-# k2-raster
+#############
+# k2-raster #
+#############
 add_executable(encode_k2r src/k2_raster_encode.cpp ${SOURCES})
 target_link_libraries(encode_k2r sdsl divsufsort divsufsort64)
 
@@ -102,8 +142,9 @@ target_link_libraries(get_values_window_k2r sdsl divsufsort divsufsort64)
 add_executable(check_values_window_k2r src/k2_raster_check_values_window.cpp ${SOURCES})
 target_link_libraries(check_values_window_k2r sdsl divsufsort divsufsort64)
 
-
-# Temporal
+##############
+# k2t-raster #
+##############
 add_executable(encode_tk2r src/temporal/k2_raster_temporal_encode.cpp ${SOURCES})
 target_link_libraries(encode_tk2r sdsl divsufsort divsufsort64)
 
@@ -122,7 +163,39 @@ target_link_libraries(space_tk2r sdsl divsufsort divsufsort64)
 add_executable(info_tk2r src/temporal/k2_raster_temporal_info.cpp ${SOURCES})
 target_link_libraries(info_tk2r sdsl divsufsort divsufsort64)
 
-# Utils
+#############
+# Algebra   #
+#############
+add_executable(algebra_k2r src/algebra/k2_raster_algebra.cpp ${SOURCES})
+target_link_libraries(algebra_k2r sdsl divsufsort divsufsort64)
+
+add_executable(algebra_th_k2r src/algebra/k2_raster_thresholding.cpp ${SOURCES})
+target_link_libraries(algebra_th_k2r sdsl divsufsort divsufsort64)
+
+add_executable(algebra_sc_k2r src/algebra/k2_raster_scalar.cpp ${SOURCES})
+target_link_libraries(algebra_sc_k2r sdsl divsufsort divsufsort64)
+
+add_executable(algebra_de_k2r src/algebra/k2_raster_algebra_de.cpp ${SOURCES})
+target_link_libraries(algebra_de_k2r sdsl divsufsort divsufsort64)
+
+add_executable(algebra_th_de_k2r src/algebra/k2_raster_thresholding_de.cpp ${SOURCES})
+target_link_libraries(algebra_th_de_k2r sdsl divsufsort divsufsort64)
+
+add_executable(algebra_sc_de_k2r src/algebra/k2_raster_scalar_de.cpp ${SOURCES})
+target_link_libraries(algebra_sc_de_k2r sdsl divsufsort divsufsort64)
+
+add_executable(algebra_zonal_k2r src/algebra/k2_raster_zonal.cpp ${SOURCES})
+target_link_libraries(algebra_zonal_k2r sdsl divsufsort divsufsort64)
+
+add_executable(algebra_zonal_opt_k2r src/algebra/k2_raster_zonal_op.cpp ${SOURCES})
+target_link_libraries(algebra_zonal_opt_k2r sdsl divsufsort divsufsort64)
+
+add_executable(algebra_zonal_de_k2r src/algebra/k2_raster_zonal_de.cpp ${SOURCES})
+target_link_libraries(algebra_zonal_de_k2r sdsl divsufsort divsufsort64)
+
+#############
+# Utils     #
+#############
 add_executable(create_access_queries_tk2r src/utils/create_access_queries_tk2r.cpp ${SOURCES})
 target_link_libraries(create_access_queries_tk2r sdsl divsufsort divsufsort64)
 
@@ -135,8 +208,12 @@ target_link_libraries(create_window_queries_tk2r sdsl divsufsort divsufsort64)
 add_executable(create_fixed_region_queries_tk2r src/utils/create_fixed_region_queries_tk2r.cpp ${SOURCES})
 target_link_libraries(create_fixed_region_queries_tk2r sdsl divsufsort divsufsort64)
 
+add_executable(extract_last_level src/utils/extract_last_level.cpp ${SOURCES})
+target_link_libraries(extract_last_level sdsl divsufsort divsufsort64)
 
-# TEST
+#############
+# TEST      #
+#############
 add_executable(test_k2_raster test/test_k2_raster.cpp ${SOURCES})
 target_link_libraries(test_k2_raster sdsl divsufsort divsufsort64 gtest)
 
@@ -161,6 +238,10 @@ target_link_libraries(test_at_k2_raster sdsl divsufsort divsufsort64 gtest)
 
 add_executable(test_ath_k2_raster test/temporal/test_ath_k2_raster.cpp ${SOURCES})
 target_link_libraries(test_ath_k2_raster sdsl divsufsort divsufsort64 gtest)
+
+# TEST (algebra)
+add_executable(test_algebra_k2_raster test/algebra/test_algebra_k2_raster.cpp ${SOURCES})
+target_link_libraries(test_algebra_k2_raster sdsl divsufsort divsufsort64 gtest)
 
 # TEST (Dac)
 add_executable(test_dac test/test_new_DAC.cpp ${SOURCES})

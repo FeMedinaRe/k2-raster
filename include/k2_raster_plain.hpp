@@ -53,12 +53,12 @@ namespace k2raster {
         ushort k_level_k2=0;
         ushort k_level_plain=0;
 
-        ushort k_size_leaves=0;
+        size_t k_size_leaves=0;
         t_values_last k_plain_values;
 
     public:
         const ushort &m_level_plain = k_level_plain;
-        const ushort &m_size_leaves = k_size_leaves;
+        const size_t &m_size_leaves = k_size_leaves;
         const t_values_last &m_plain_values = k_plain_values;
 
     public:
@@ -175,8 +175,8 @@ namespace k2raster {
             size_type size = this->k_size;                      // Current matrix size
             size_type child_pos = 0;                            // Children position on bitmap k_t of the current node
             value_type max_value = this->k_max_value;           // Current max value
+            ushort levels = std::min(this->k_level_k1 + this->k_level_k2, this->k_height-1);
             {
-                ushort levels = std::min(this->k_level_k1 + this->k_level_k2+1, this->k_height-1);
                 ushort k = this->get_k(0);
                 size_type child;
 
@@ -220,7 +220,8 @@ namespace k2raster {
                 } else {
                     // Value is in plain form
                     size_type ones = this->k_t_rank1(child_pos) + 1;      // Number of non-empty nodes until position 'child_pos'
-                    ones = ones - (this->k_accum_min_values[this->k_height - 2] + 1);
+                    //ones = ones - (this->k_accum_min_values[this->k_height - 2] + 1);
+                    ones = ones - (this->k_accum_min_values[levels-1] + 1);
                     child_pos = ones * size * size;
                     return get_cell_plain(row, col, size, child_pos, max_value);
                 }
@@ -301,9 +302,9 @@ namespace k2raster {
             return this->k_level_plain > 0 && (level == (this->k_level_k1 + this->k_level_k2));
         }
 
-        virtual short get_cell_n_levels() const {
-            return std::min(this->k_level_k1 + this->k_level_k2+1, this->k_height-1);
-        }
+//        virtual short get_cell_n_levels() const {
+//            return std::min(this->k_level_k1 + this->k_level_k2+1, this->k_height-1);
+//        }
 
         //*******************************************************//
         //********************** FILE ***************************//
@@ -320,12 +321,24 @@ namespace k2raster {
             return written_bytes;
         }
 
+
+        virtual size_t store_last_level(std::ostream& out) const {
+            size_t n_values = 0;
+            std::cout << "Original size: " << sdsl::size_in_mega_bytes(k_plain_values) << "MB" << std::endl;
+            std::cout << "Extracting " << k_plain_values.size() << ". " << k_size_leaves << " values per node." << std::endl;
+            for (auto const &value : k_plain_values) {
+                out.write((char*)&value, sizeof(value));
+                n_values++;
+            }
+            return n_values;
+        }
+
         void load(std::istream& in) {
             load_base(in);
             sdsl::load(k_plain_values, in);;
         }
 
-        void copy(ushort &level_k2, ushort &level_plain, ushort &size_leaves) const {
+        void copy(ushort &level_k2, ushort &level_plain, size_type &size_leaves) const {
             level_k2 = k_level_k2;
             level_plain = k_level_plain;
             size_leaves = k_size_leaves;
@@ -354,7 +367,7 @@ namespace k2raster {
             }
             k2raster_node<value_type> node = k2_raster_p::get_child(parent, child);
 
-            if (node.level == this->k_level_k1 + k_level_k2+1) {
+            if (node.level == this->k_level_k1 + k_level_k2) {
                 node.children_pos = parent.children_pos + child;
             }
             return node;
@@ -394,7 +407,7 @@ namespace k2raster {
         //********************** HELPERS ************************//
         //*******************************************************//
 
-        void copy_parameters(ushort &level_k1, ushort &level_k2, ushort &level_plain, ushort &size_leaves) {
+        void copy_parameters(ushort &level_k1, ushort &level_k2, ushort &level_plain, size_type &size_leaves) {
             level_k1 = this->k_level_k1;
             level_k2 = k_level_k2;
             level_plain = k_level_plain;
@@ -433,7 +446,7 @@ namespace k2raster {
             }
 
             k_size_leaves = this->k_size;
-            for (auto l = 0; l <= this->k_height - k_level_plain; l++) {
+            for (auto l = 0; l < this->k_height - k_level_plain; l++) {
                 k_size_leaves /= this->get_k(l);
             }
             k_size_leaves *= k_size_leaves;
@@ -476,7 +489,7 @@ namespace k2raster {
             max_value = std::numeric_limits<value_type>::min();
 
 
-            if (level == this->k_level_k1 + k_level_k2 + 1) {
+            if (level == this->k_level_k1 + k_level_k2) {
                 /****************/
                 /* PLAIN VALUES */
                 /****************/

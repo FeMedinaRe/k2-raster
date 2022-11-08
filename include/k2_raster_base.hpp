@@ -28,15 +28,45 @@
 #ifndef INCLUDED_K2_RASTER_BASE
 #define INCLUDED_K2_RASTER_BASE
 
+
+// System libraries
+#include <assert.h>
+
+// Own libraries
 #include <utils/dac_vector.hpp>
+//#include <utils/utils_memory.hpp>
 
 
 //! Namespace for k2-raster library
 namespace k2raster {
-    // Types
+    /****** Types ******/
     static const ushort K2_RASTER_TYPE = 1;
     static const ushort K2_RASTER_TYPE_PLAIN = 10;
     static const ushort K2_RASTER_TYPE_HEURISTIC = 11;
+
+    /****** Operations ******/
+    enum OperationRaster {
+        OPERATION_SUM,
+        OPERATION_SUBT,
+        OPERATION_MULT
+    };
+
+    enum OperationZonalRaster {
+        OPERATION_ZONAL_SUM,
+    };
+
+    //*******************************************************//
+    //******************* TYPE HELPER ***********************//
+    //*******************************************************//
+
+    ushort get_type(const std::string &input_file) {
+        std::ifstream k2raster_file(input_file);
+        assert(k2raster_file.is_open() && k2raster_file.good());
+        ushort k2_raster_type;
+        sdsl::read_member(k2_raster_type, k2raster_file);
+        k2raster_file.close();
+        return k2_raster_type;
+    }
 
     //*******************************************************//
     //******************* NODE HELPER ***********************//
@@ -47,7 +77,15 @@ namespace k2raster {
         t_value min_value;
         t_value max_value;
         ushort level;
-        sdsl::int_vector<>::size_type children_pos;
+        size_t children_pos;
+    };
+
+    template <typename t_value=int>
+    struct k2raster_submatrix {
+        bool is_uniform;
+        t_value max_value;
+        ushort level;
+        size_t children_pos;
     };
 
     template <typename value_type>
@@ -151,7 +189,6 @@ class k2_raster_base
             *this = std::move(tr);
         }
 
-
         //*******************************************************//
         //*************** BASIC OPERATIONS **********************//
         //*******************************************************//
@@ -244,6 +281,40 @@ class k2_raster_base
             }
         }
 
+        void copy(const k2_raster_base& tr) {
+            /****** Params and topology ******/
+            this->copy_topology(tr);
+
+            /****** Values ******/
+            k_max_value = tr.k_max_value;
+            k_min_value = tr.k_min_value;
+            k_list_max = tr.k_list_max;
+            k_list_min = tr.k_list_min;
+        }
+
+        void copy_topology(const k2_raster_base& tr) {
+            if (this != &tr) {
+                k_k2_raster_type = tr.k_k2_raster_type;
+                /****** Size params ******/
+                k_real_size_x = tr.k_real_size_x;
+                k_real_size_y = tr.k_real_size_y;
+                k_size = tr.k_size;
+                /****** Basic params ******/
+                k_k1 = tr.k_k1;
+                k_k2 = tr.k_k2;
+                k_level_k1 = tr.k_level_k1;
+                k_height = tr.k_height;
+                /****** Structures ******/
+                k_t = tr.k_t;
+                k_t_rank1 = tr.k_t_rank1;
+                k_t_rank1.set_vector(&k_t);
+                k_count_1s_k1 = tr.k_count_1s_k1;
+                /****** Values ******/
+                k_accum_min_values = tr.k_accum_min_values;
+                k_accum_max_values = tr.k_accum_max_values;
+            }
+        }
+
         //! Equal operator
         bool operator==(const k2_raster_base& tr) const
         {
@@ -292,7 +363,7 @@ class k2_raster_base
             return false;
         }
 
-        inline size_type get_children_position_ones(size_type n_ones, ushort l) const {
+        inline size_type get_children_position_ones(const size_type n_ones, const ushort l) const {
             if (l < this->k_level_k1) {
                 return n_ones * k_k1 * k_k1;
             } else {
@@ -344,6 +415,21 @@ class k2_raster_base
             return false;
         }
 
+        virtual size_type decompress_plain(size_type size __attribute__((unused)), size_type children_pos __attribute__((unused)),
+                                           value_type father_value __attribute__((unused)), std::vector<value_type> &result __attribute__((unused))) {
+        return 0;
+    }
+
+        //*******************************************************//
+        //******************* DECOMPRESS ************************//
+        //*******************************************************//
+        template<class Container>
+        void decompress(Container&& values, size_type &n_rows, size_type &n_cols) {
+            n_rows = this->k_real_size_x;
+            n_cols = this->k_real_size_y;
+            get_values_window(0, n_rows-1, 0, n_cols-1, values);
+        }
+
         //*******************************************************//
         //********************** FILE ***************************//
         //*******************************************************//
@@ -386,10 +472,23 @@ class k2_raster_base
             return written_bytes;
         }
 
+        virtual size_t store_last_level(std::ostream& out) const {
+            size_t n_values = 0;
+
+            if (k_list_max.size() == k_height) {
+                std::cout << "Original size: " << sdsl::size_in_mega_bytes(k_list_max[k_list_max.size()-1]) << "MB" << std::endl;
+
+                for (auto const &value : k_list_max[k_list_max.size()-1]) {
+                    out.write((char*)&value, sizeof(value));
+                    n_values++;
+                }
+            }
+            return n_values;
+        }
+
         virtual void load(std::istream& in) {
             /****** k2-raster Type ******/
-            ushort k2_raster_type;
-            sdsl::read_member(k2_raster_type, in);
+            sdsl::read_member(k_k2_raster_type, in);
 
             /****** Size params ******/
             sdsl::read_member(k_real_size_x, in);
@@ -419,6 +518,18 @@ class k2_raster_base
             sdsl::load(k_accum_max_values, in);
         }
 
+        //*******************************************************//
+        //********************** UTILS **************************//
+        //*******************************************************//
+       /* void print_memory_consumption(ushort step=0) {
+        if (step > 0) {
+            std::cout << "Step: " << step <<": ";
+        }
+        std::cout << "[[Mem. consumption]]  Current allocation: ";
+        std::cout << malloc_count_current()/1024/1024 << " MB, Peak allocation: ";
+        std::cout << malloc_count_peak()/1024/1024 << " MB" << std::endl;
+    }*/
+
 
         //*******************************************************//
         //********************** TEST ***************************//
@@ -446,8 +557,8 @@ class k2_raster_base
         return {k_min_value, k_max_value, 0, 0};
     }
 
-    virtual k2raster_node<value_type> get_child(const k2raster_node<value_type> parent, uint child) const {
-        if (this->k_t.empty() || parent.min_value == parent.max_value|| parent.level == this->k_height) {
+    virtual k2raster_node<value_type> get_child(const k2raster_node<value_type> &parent, uint child) const{
+        if (this->k_t.empty() || parent.min_value == parent.max_value || parent.level == this->k_height) {
             // No children
             return parent;
         }
@@ -476,7 +587,33 @@ class k2_raster_base
         return child_node;
     }
 
+    void get_next_child(const k2raster_submatrix<value_type> &parent, k2raster_submatrix<value_type> &child_node, std::vector<size_type> &last_access){
+        if (parent.is_uniform || parent.level == this->k_height) {
+            // No children
+            child_node = parent;
+            return;
+        }
+
+        // Get max value
+        child_node.max_value = parent.max_value - get_max_value_op(child_node.level, parent.children_pos);
+
+        // Check if all the cells in the subarray are equal (uniform matrix)
+        child_node.is_uniform = child_node.level == this->k_height || !(this->k_t[parent.children_pos]);
+        if (!child_node.is_uniform) {
+            if (last_access[child_node.level-1] == 0) {
+                last_access[child_node.level-1] = k_t_rank1(parent.children_pos) + 1;      // Number of non-empty nodes until position 'child_pos'
+            } else {
+                last_access[child_node.level-1]++;
+            }
+            set_children_position(child_node, last_access[child_node.level-1]/* + this->k_accum_min_values[child_node.level-1]*/);
+        } // END IF set_min
+    }
+
     virtual inline void set_children_position(k2raster_node<value_type> &child_node, size_type ones ) const{
+        child_node.children_pos = this->get_children_position_ones(ones, child_node.level);
+    }
+
+    virtual inline void set_children_position(k2raster_submatrix<value_type> &child_node, size_type ones ) const{
         child_node.children_pos = this->get_children_position_ones(ones, child_node.level);
     }
 
@@ -484,10 +621,17 @@ class k2_raster_base
         return k_list_max[level-1][pos - this->k_accum_max_values[level-1]];
     }
 
+    inline value_type get_max_value_op(ushort level, size_type pos) {
+        return k_list_max[level-1].access(pos - this->k_accum_max_values[level-1]);
+    }
+
     inline value_type get_min_value(ushort level, size_type ones) const {
         return k_list_min[level-1][ones - this->k_accum_min_values[level-1]];
     }
 
+    inline value_type get_min_value_op(ushort level, size_type ones) {
+        return k_list_min[level-1].access(ones - this->k_accum_min_values[level-1]);
+    }
 
     inline value_type get_min_value(ushort level, size_type pos, size_type &ones) const {
             ones = this->k_t_rank1(pos);
@@ -528,7 +672,7 @@ class k2_raster_base
         //*******************************************************//
 
 
-        void init_levels(){
+    virtual void init_levels(){
             // Calculate size, number of levels and other important params
             size_type size = std::max(k_real_size_x, k_real_size_y);
             k_height = std::ceil(std::log(size)/std::log(std::min(k_k1, k_k2))); // TODO fix this for k1 and k2
@@ -538,7 +682,7 @@ class k2_raster_base
             ushort l = 0;
             while (sub_size != 1) {
                 sub_size /= get_k(l);
-                l++;
+                    l++;
                 if (sub_size == 0) {
                     std::cout << "Error: k1 = " << k_k1 << " and k2 = " << k_k2 << " are not valid params";
                     std::cout << " with size " << k_real_size_x << "x" << k_real_size_x << " (" << k_size << "x" << k_size << ")" << std::endl;
@@ -551,36 +695,95 @@ class k2_raster_base
             k_level_k1 = k_level_k1 > l ? l : k_level_k1;
         }
 
+        void copy_initial_parameters(const k2_raster_base &k2raster1)
+        {
+            // Set type
+            this->k_k2_raster_type = k2raster1.k_k2_raster_type;
+
+            // Set K values and store real sizes
+            k_real_size_x = k2raster1.k_real_size_x;
+            k_real_size_y = k2raster1.k_real_size_y;
+            k_k1 = k2raster1.k_k1;
+            k_k2 = k2raster1.k_k2;
+            k_level_k1 = k2raster1.k_level_k1;
+
+            // Initialize levels with new values of K
+            init_levels();
+
+            // Resize arrays of values
+            k_list_max.resize(k_height);
+            k_list_min.resize(k_height);
+            k_accum_max_values.resize(k_height+1); //TODO change to k_height
+            k_accum_min_values.resize(k_height+1); //TODO change to k_height
+        }
+
+        void copy_initial_parameters(const k2_raster_base &k2raster1, const k2_raster_base &k2raster2)
+        {
+            // Set type
+            assert(k2raster1.k_k2_raster_type == k2raster2.k_k2_raster_type);
+            this->k_k2_raster_type = k2raster1.k_k2_raster_type;
+
+            // Set K values and store real sizes
+            assert(k2raster1.k_size == k2raster2.k_size);
+            assert(k2raster1.k_k1 == k2raster2.k_k1);
+            assert(k2raster1.k_k2 == k2raster2.k_k2);
+            assert(k2raster1.k_level_k1 == k2raster2.k_level_k1);
+            assert(k2raster1.k_size == k2raster2.k_size);
+
+            k_real_size_x = std::min(k2raster1.k_real_size_x, k2raster2.k_real_size_x);
+            k_real_size_y = std::min(k2raster1.k_real_size_y, k2raster2.k_real_size_y);
+            k_k1 = k2raster1.k_k1;
+            k_k2 = k2raster1.k_k2;
+            k_level_k1 = k2raster1.k_level_k1;
+
+            // Initialize levels with new values of K
+            init_levels();
+
+            // Resize arrays of values
+            k_list_max.resize(k_height);
+            k_list_min.resize(k_height);
+            k_accum_max_values.resize(k_height); //TODO change to k_height
+            k_accum_min_values.resize(k_height); //TODO change to k_height
+        }
+
         //*******************************************************//
         //*********************** BUILD *************************//
         //*******************************************************//
 
-        size_type build_max_values(const std::vector<std::vector<value_type>> &max_values_,
-                std::vector<sdsl::int_vector<1>> &tmp_t_) {
-            ushort l;
-            size_type n_nodes = 0;
-            this->k_list_max.resize(max_values_.size());
-            this->k_accum_max_values.resize(max_values_.size()+1);
+    template <class vector_values>
+    size_type build_max_values(std::vector<vector_values> &max_values_) {
+        ushort l;
+        size_type n_nodes = 0;
+        this->k_list_max.resize(max_values_.size());
+        this->k_accum_max_values.resize(max_values_.size()+1);
 
-            for (l = 0; l < max_values_.size(); l++) {
-                if (!max_values_[l].empty()) {
-                    this->k_list_max[l] = t_values_vec(max_values_[l]);
-                    if (l != this->k_height - 1) {
-                        n_nodes += max_values_[l].size();
-                    }
-                    this->k_accum_max_values[l+1] = this->k_accum_max_values[l] + this->k_list_max[l].size();
-                } else{
-                    break; // Empty levels
+        for (l = 0; l < max_values_.size(); l++) {
+            if (!max_values_[l].empty()) {
+                this->k_list_max[l] = t_values_vec(max_values_[l]);
+                if (l != this->k_height - 1) {
+                    n_nodes += max_values_[l].size();
                 }
+                this->k_accum_max_values[l+1] = this->k_accum_max_values[l] + this->k_list_max[l].size();
+                max_values_[l].resize(0);
+            } else{
+                break; // Empty levels
             }
-            this->k_list_max.resize(l);
-            this->k_accum_max_values.resize(l+1);
-            tmp_t_.resize(l);
+        }
+        this->k_list_max.resize(l);
+        this->k_accum_max_values.resize(l+1);
+        return n_nodes;
+    }
 
+        template <class vector_values>
+        size_type build_max_values(std::vector<vector_values> &max_values_,
+                std::vector<sdsl::int_vector<1>> &tmp_t_) {
+            size_type n_nodes = this->build_max_values(max_values_);
+            tmp_t_.resize(this->k_list_max.size());
             return n_nodes;
         }
 
-        void build_min_values(const std::vector<std::vector<value_type>> &min_values_){
+        template <class vector_values>
+        void build_min_values(std::vector<vector_values> &min_values_){
             ushort l;
             this->k_list_min.resize(min_values_.size());
             this->k_accum_min_values.resize(min_values_.size()+1);
@@ -593,6 +796,7 @@ class k2_raster_base
                     if (l+1 < this->k_level_k1) {
                         this->k_count_1s_k1 += min_values_[l].size();
                     }
+                    min_values_[l].resize(0);
                     this->k_accum_min_values[l+1] = this->k_accum_min_values[l] + this->k_list_min[l].size();
                 } else{
                     break; // Empty levels

@@ -25,17 +25,18 @@
  *
  */
 
-
+// System libraries
+// Own libraries
 #include <temporal/k2_raster_temporal.hpp>
 #include <temporal/t_k2_raster.hpp>
 #include <temporal/k2_raster_temporal_global.hpp>
 #include <temporal/at_k2_raster.hpp>
 #include <utils/utils_time.hpp>
+#include <utils/args/utils_args_raster_temporal.hpp>
+// Third libraries
 
-void print_help(char * argv0) {
-    printf("Usage: %s <inputs_file> <input_path> <scale_factor>  <output_path> <type> <snap_freq> <set_check>\n",
-           argv0);
-}
+
+
 
 template<typename k2_raster_temporal_type>
 void run_encode(std::string inputs_filename, std::string input_path, ushort scale_factor, std::string output_filename, size_t  snap_freq, bool set_check) {
@@ -107,47 +108,37 @@ void run_encode(std::string inputs_filename, std::string input_path, ushort scal
 
 int main(int argc, char **argv) {
 
-    if (argc != 8) {
-        print_help(argv[0]);
-        exit(-1);
-    }
-
     /*********************/
     /* Reads params      */
     /*********************/
-    std::string inputs_filename = argv[1];
-    std::string input_path = argv[2];
-    ushort scale_factor = atoi(argv[3]);
-    std::string output_filename = argv[4];
-    ushort k2_raster_type = atoi(argv[5]);
-    size_t snap_freq = atol(argv[6]);
-    bool set_check = atoi(argv[7]);
+    args_encode_temporal args;
+    parse_args_encode_temporal(argc, argv, args);
 
     /*********************/
     /* Encodes data      */
     /*********************/
-    switch (k2_raster_type) {
+    switch (args.type) {
         case k2raster::K2_RASTER_TEMPORAL_TYPE:
-            run_encode<k2raster::k2_raster_temporal<>>(inputs_filename, input_path, scale_factor, output_filename, snap_freq, set_check);
+            run_encode<k2raster::k2_raster_temporal<>>(args.input_file, args.input_folder, args.scale_factor, args.output_data, args.snap_freq, args.set_check);
             break;
         case k2raster::K2_RASTER_TEMPORAL_TYPE_H:
-            run_encode<k2raster::k2rth_type>(inputs_filename, input_path, scale_factor, output_filename, snap_freq, set_check);
+            run_encode<k2raster::k2rth_type>(args.input_file, args.input_folder, args.scale_factor, args.output_data, args.snap_freq, args.set_check);
             break;
         case k2raster::T_K2_RASTER_TYPE:
-            run_encode<k2raster::t_k2_raster<>>(inputs_filename, input_path, scale_factor, output_filename, snap_freq, set_check);
+            run_encode<k2raster::t_k2_raster<>>(args.input_file, args.input_folder, args.scale_factor, args.output_data, args.snap_freq, args.set_check);
             break;
         case k2raster::AT_K2_RASTER_TYPE:
-            run_encode<k2raster::atk2r_type>(inputs_filename, input_path, scale_factor, output_filename, snap_freq, set_check);
+            run_encode<k2raster::atk2r_type>(args.input_file, args.input_folder, args.scale_factor, args.output_data, args.snap_freq, args.set_check);
             break;
         case k2raster::ATH_K2_RASTER_TYPE:
-            run_encode<k2raster::athk2r_type>(inputs_filename, input_path, scale_factor, output_filename, snap_freq, set_check);
+            run_encode<k2raster::athk2r_type>(args.input_file, args.input_folder, args.scale_factor, args.output_data, args.snap_freq, args.set_check);
             break;
         case k2raster::K2_RASTER_TEMPORAL_GLOBAL_TYPE:
-            run_encode<k2raster::k2_raster_temporal_global<>>(inputs_filename, input_path, scale_factor, output_filename, snap_freq, set_check);
+            run_encode<k2raster::k2_raster_temporal_global<>>(args.input_file, args.input_folder, args.scale_factor, args.output_data, args.snap_freq, args.set_check);
             break;
         default:
             print_help(argv[0]);
-            std::cout << "Invalid type " << k2_raster_type << ": " << std::endl;
+            std::cout << "Invalid type " << args.type << ": " << std::endl;
             std::cout << "\t Type " << k2raster::K2_RASTER_TEMPORAL_TYPE << ": k2-raster temporal (set of k2-raster)." << std::endl;
             std::cout << "\t Type " << k2raster::K2_RASTER_TEMPORAL_TYPE_H << ": k2-raster temporal (set of k2-raster_heuristic)." << std::endl;
             std::cout << "\t Type " << k2raster::T_K2_RASTER_TYPE << ": t_k2-raster: Temporal k2-raster." << std::endl;

@@ -61,13 +61,13 @@ TYPED_TEST(test_new_DAC, build){
 
     std::vector<uint> values(max_size);
 
-    for (auto p = 0; p < max_size; p++) {
+    for (size_t p = 0; p < max_size; p++) {
         values[p] = dis_values(gen);
     }
 
     // Run New DAC
     TypeParam dac(values);
-    for (auto p = 0; p < max_size; p++) {
+    for (size_t p = 0; p < max_size; p++) {
         ASSERT_TRUE(values[p] == dac[p]);
     }
 
@@ -87,14 +87,14 @@ TYPED_TEST(test_new_DAC, build){
 
 
         auto start_time_dac_old = std::chrono::high_resolution_clock::now();
-        for (auto p = 0; p < max_size; p++) {
+        for (size_t p = 0; p < max_size; p++) {
             val_old += dac_old[p];
         }
         auto stop_time_dac_old = std::chrono::high_resolution_clock::now();
 
 
         auto start_time_dac = std::chrono::high_resolution_clock::now();
-        for (auto p = 0; p < max_size; p++) {
+        for (size_t p = 0; p < max_size; p++) {
             val1 += dac[p];
         }
         auto stop_time_dac = std::chrono::high_resolution_clock::now();
@@ -107,20 +107,20 @@ TYPED_TEST(test_new_DAC, build){
 
 
         auto start_time_dac_for = std::chrono::high_resolution_clock::now();
-        for (auto p = 0; p < max_size; p++) {
+        for (size_t p = 0; p < max_size; p++) {
             val3 += dac.accessFor(p);
         }
         auto stop_time_dac_for = std::chrono::high_resolution_clock::now();
 
         val4 = dac.accessFor(0);
         auto start_time_dac_next = std::chrono::high_resolution_clock::now();
-        for (auto p = 1; p < max_size; p++) {
+        for (size_t p = 1; p < max_size; p++) {
             val4 += dac.next();
         }
         auto stop_time_dac_next = std::chrono::high_resolution_clock::now();
 
         auto start_time_dac_access = std::chrono::high_resolution_clock::now();
-        for (auto p = 0; p < max_size; p++) {
+        for (size_t p = 0; p < max_size; p++) {
             val5 += dac.access(p);
         }
         auto stop_time_dac_access = std::chrono::high_resolution_clock::now();
@@ -156,30 +156,30 @@ TYPED_TEST(test_new_DAC, build){
     { // Time random
         uint val1=0, val2=0, val3=0, val4=0;
         std::vector<uint> queries(n_queries);
-        for (auto p = 0; p < n_queries; p++) {
+        for (size_t p = 0; p < n_queries; p++) {
             queries[p] = dis_size(gen);
         }
 
         auto start_time_dac = std::chrono::high_resolution_clock::now();
-        for (auto p = 0; p < n_queries; p++) {
+        for (size_t p = 0; p < n_queries; p++) {
             val1 += dac[queries[p]];
         }
         auto stop_time_dac = std::chrono::high_resolution_clock::now();
 
         auto start_time_dac_for = std::chrono::high_resolution_clock::now();
-        for (auto p = 0; p < n_queries; p++) {
+        for (size_t p = 0; p < n_queries; p++) {
             val3 += dac.accessFor(queries[p]);
         }
         auto stop_time_dac_for = std::chrono::high_resolution_clock::now();
 
         auto start_time_dac_old = std::chrono::high_resolution_clock::now();
-        for (auto p = 0; p < n_queries; p++) {
+        for (size_t p = 0; p < n_queries; p++) {
             val2 += dac_old[queries[p]];
         }
         auto stop_time_dac_old = std::chrono::high_resolution_clock::now();
 
         auto start_time_dac_access = std::chrono::high_resolution_clock::now();
-        for (auto p = 0; p < n_queries; p++) {
+        for (size_t p = 0; p < n_queries; p++) {
             val4 += dac.access(queries[p]);
         }
         auto stop_time_dac_access = std::chrono::high_resolution_clock::now();
@@ -199,11 +199,6 @@ TYPED_TEST(test_new_DAC, build){
                 stop_time_dac_access - start_time_dac_access).count();
         std::cout << " milliseconds." << std::endl;
     }
-
-
-
-
-
 }
 
 int main(int argc, char** argv) {

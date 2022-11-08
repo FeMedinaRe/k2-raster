@@ -34,6 +34,9 @@
 //! Namespace for k2-raster library
 namespace k2raster {
 
+    //*******************************************************//
+    //************* CREATE ACCESS QUERIES *******************//
+    //*******************************************************//
     template <typename size_type=size_t, bool add_time=true, bool add_n_queries_beginning=true>
     void create_access_queries(size_type n_queries, std::ofstream &outFile, size_type xini, size_type xend, size_type yini, size_type yend,
                                size_type tini=0, size_type tend=0) {
@@ -74,7 +77,9 @@ namespace k2raster {
 
 
 
-
+    //*******************************************************//
+    //************* CREATE REGION QUERIES *******************//
+    //*******************************************************//
     template <typename size_type=size_t, typename value_type=int, bool add_time=true, bool add_values=true, bool add_n_queries_beginning=true>
     void create_region_queries(size_type n_queries, std::ofstream &outFile, size_type xini, size_type xend, size_type yini, size_type yend,
             size_type tini=0, size_type tend=0, value_type valini=0, value_type valend=0) {
@@ -126,6 +131,9 @@ namespace k2raster {
         } // END FOR n_queries
     }
 
+    //*******************************************************//
+    //*********** CREATE FIXED REGION QUERIES ***************//
+    //*******************************************************//
     template <typename size_type=size_t, typename value_type=int, bool add_time=true, bool add_values=true, bool add_n_queries_beginning=true>
     void create_fixed_region_queries(size_type n_queries, std::ofstream &outFile,
                 size_type xini, size_type xend, size_type row_size,
@@ -143,7 +151,7 @@ namespace k2raster {
         row_size = ((xend - xini + 1) < row_size) ? (xend - xini) : row_size - 1;
         col_size = ((yend - yini + 1) < col_size) ? (yend - yini) : col_size - 1;
         time_size = ((tend - tini + 1) < time_size) ? (tend - tini) : time_size - 1;
-        value_size = ((valend - valini + 1) < value_size) ? (valend - valini) : value_size - 1;
+        value_size = ((valend - valini + 1) < (value_type)value_size) ? (valend - valini) : (value_type)(value_size - 1);
 
         std::uniform_int_distribution<size_type>    dis_x(xini, xend - row_size);
         std::uniform_int_distribution<size_type>    dis_y(yini, yend - col_size);

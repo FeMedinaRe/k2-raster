@@ -177,9 +177,14 @@ public:
     //************************ INFO *************************//
     //*******************************************************//
     void print() const {
-        std::cout << "Range  [" << xini << ", " << yini << " - " << xend << ", " << yend << "] -> ";
-        std::cout << "Values [" << valini << ", " << valend << "] -> ";
-        std::cout << "Time [" << tini << ", " << tend << "]" << std::endl;
+        std::cout << "Range  [" << xini << ", " << yini << " - " << xend << ", " << yend << "] ";
+        if (with_value) {
+            std::cout << "-> Values [" << valini << ", " << valend << "] ";
+        }
+        if (with_time) {
+            std::cout << "-> Time [" << tini << ", " << tend << "]" ;
+        }
+        std::cout << std::endl;
     }
 
 }; // END CLASS query

@@ -81,7 +81,6 @@ class dac_vector_dp_opt
                 const std::vector<int>& bit_sizes,
                 Container&& c)
         {
-
             int bits_next = bit_sizes[level];
             if (level == (bit_sizes.size() - 1)) {
                 // Last level
@@ -120,7 +119,7 @@ class dac_vector_dp_opt
             }
 
             auto& data = m_data[level];
-            data = int_vector<>(n - overflows, bits_next);
+            data = int_vector<>(n - overflows, 0, bits_next);
 
             size_t idx_data = 0, idx_recurse = 0;
             int_vector<> recurse(overflows, 0, max_msb + 1);
@@ -131,9 +130,11 @@ class dac_vector_dp_opt
                     data[idx_data++] = c[i] - m_table_base[level];
                 }
             }
+
             util::bit_compress(data);
             assert(idx_data == n-overflows);
             assert(idx_recurse == overflows);
+
 
             construct_level(
                 level + 1,
@@ -324,6 +325,9 @@ class dac_vector_dp_opt
             return (m_last_pos == i) ? next() : accessFor(i);
         }
 
+        size_type last_access() const{
+            return m_last_pos;
+        }
         //! []-operator
         inline value_type accessFor(size_type i)
         {

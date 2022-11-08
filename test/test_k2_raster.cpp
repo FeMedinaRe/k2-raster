@@ -42,7 +42,7 @@ size_t rows = 800;
 size_t cols = 800;
 int min_value = -100;
 int max_value = 100;
-uint n_random_queries = 100;
+size_t n_random_queries = 100;
 std::vector<int> values(rows*cols);
 
 ushort k1 = 4;
@@ -73,8 +73,8 @@ TYPED_TEST_CASE(test_k2_raster, Implementations);
 // TEST Encode - Create k2_raster (in-memory)
 TYPED_TEST(test_k2_raster, CretateInMemory){
 
-    for (auto r = 0; r < rows; r++) {
-        for (auto c = 0; c < cols; c++) {
+    for (uint r = 0; r < rows; r++) {
+        for (uint c = 0; c < cols; c++) {
             values[r * cols + c] = dis_values(gen);
         }
     }
@@ -104,7 +104,7 @@ TYPED_TEST(test_k2_raster, QueryGet){
     output_file.close();
 
     // Get 'n_random_queries' positions
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (size_t n = 0; n < n_random_queries; n++) {
         auto row = dis_row(gen);
         auto col = dis_col(gen);
         ASSERT_EQ(values[row * cols + col], k2raster.get_cell(row, col));
@@ -124,7 +124,7 @@ TYPED_TEST(test_k2_raster, QueryGetCellsByValue){
     output_file.close();
 
     // Run 'n_random_queries' queries
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (size_t n = 0; n < n_random_queries; n++) {
         auto xini = dis_row(gen);
         auto yini = dis_col(gen);
         auto valini = dis_values(gen);
@@ -170,7 +170,7 @@ TYPED_TEST(test_k2_raster, QueryGetValuesWindow){
     output_file.close();
 
     // Run 'n_random_queries' queries
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (size_t n = 0; n < n_random_queries; n++) {
         auto xini = dis_row(gen);
         auto yini = dis_col(gen);
         std::uniform_int_distribution<> dis_max_row(xini, rows-1);
@@ -201,7 +201,7 @@ TYPED_TEST(test_k2_raster, QueryCheckValuesWindowStrong){
     output_file.close();
 
     // Run 'n_random_queries' queries
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (size_t n = 0; n < n_random_queries; n++) {
         auto xini = dis_row(gen);
         auto yini = dis_col(gen);
         auto valini = dis_values(gen);
@@ -241,7 +241,7 @@ TYPED_TEST(test_k2_raster, QueryCheckValuesWindowWeak){
     output_file.close();
 
     // Run 'n_random_queries' queries
-    for (auto n = 0; n < n_random_queries; n++) {
+    for (size_t n = 0; n < n_random_queries; n++) {
         auto xini = dis_row(gen);
         auto yini = dis_col(gen);
         auto valini = dis_values(gen);
