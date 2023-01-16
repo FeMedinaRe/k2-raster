@@ -36,15 +36,17 @@
 //**********************************************************************//
 //************************** ALGEBRA ***********************************//
 //**********************************************************************//
-template<typename k2_raster_type>
-void algebra_thresholding(k2_raster_type &raster1, int threshold_value, std::string &output_data,
+template<typename k2_raster_type,
+        typename k2_raster_in_type = k2_raster_type,
+        typename value_type=ushort>
+void algebra_thresholding(k2_raster_in_type &raster1, int threshold_value, std::string &output_data,
                           bool set_check, uint n_reps=1, ushort option=1) {
 
 
     auto t1 = util::time::user::now(); // Start time
     size_t n_rows = raster1.get_n_rows();
     size_t n_cols = raster1.get_n_cols();
-    std::vector<int> result(n_rows * n_cols, 0);
+    std::vector<value_type> result(n_rows * n_cols, 0);
     /*********************/
     /* Run operation     */
     /*********************/
@@ -115,7 +117,7 @@ void algebra_thresholding(k2_raster_type &raster1, int threshold_value, std::str
         for (uint x = 0; x < n_rows; x++) {
             for (uint y = 0; y < n_cols; y++) {
                 int result1 = raster1.get_cell(x, y);
-                int val = k2raster.get_cell(x, y);
+                value_type val = k2raster.get_cell(x, y);
                 if ((result1 >= threshold_value) != val) {
                     std::cout << std::endl;
                     std:: cout << "Found error at position (" << x << ", " << y <<", expected " << result1 << " and get " << val << std::endl;
@@ -153,7 +155,7 @@ int main(int argc, char **argv) {
                 assert(input_file_1.is_open() && input_file_1.good());
                 raster1.load(input_file_1);
 
-                algebra_thresholding<k2raster::k2_raster<>>(raster1, args.thr_value, args.output_data, args.set_check,
+                algebra_thresholding<k2raster::k2_raster<ushort>, k2raster::k2_raster<int>, ushort>(raster1, args.thr_value, args.output_data, args.set_check,
                                                             args.n_reps, 1);
                 break;
             }

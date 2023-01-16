@@ -42,8 +42,8 @@ size_t min_rows = 2100;
 size_t min_cols = 2100;
 size_t max_rows = 4000;
 size_t max_cols = 4000;
-int min_value = -100;
-int max_value = 100;
+int min_value = -1000;
+int max_value = 1000;
 
 ushort k1 = 4;
 ushort k2 = 2;

@@ -143,6 +143,74 @@ class dac_vector_dp_opt
                 recurse);
         }
 
+    template <typename Container>
+    void construct_level_scalar(
+            size_t level, size_t overflow_offset,
+            const std::vector<int>& bit_sizes,
+            Container&& c, long scalar)
+    {
+        int bits_next = bit_sizes[level];
+        if (level == (bit_sizes.size() - 1)) {
+            // Last level
+            m_offsets.push_back(overflow_offset);
+            auto& data = m_data[level];
+            data = int_vector<>(c.size());
+            for (size_t i = 0; i < c.size(); ++i) {
+                data[i] = (c[i] * scalar) - m_table_base[level];
+            }
+            util::bit_compress(data);
+
+            // pack overflow bit vector (no-op if t_bv = bit_vector)
+            m_overflow_tmp.resize(overflow_offset);
+            m_overflow = overflow_bv(std::move(m_overflow_tmp));
+            m_overflow_rank = overflow_bv_rank1(&m_overflow);
+            m_overflow_tmp = bit_vector();
+            return;
+        }
+
+        m_offsets.push_back(overflow_offset);
+        size_t n = c.size();
+
+        // mark elements with < *bit_sizes bits
+        size_t overflows = 0;
+        uint max_msb = 0; // max MSB of all values in c
+
+        for (size_t i = 0; i < n; ++i) {
+            uint msb = bits::hi((c[i] * scalar) - m_table_base[level]);
+            max_msb = std::max(max_msb, bits::hi(c[i] * scalar));
+            if (msb >= bits_next) {
+                m_overflow_tmp[overflow_offset + i] = 1;
+                overflows++;
+            } else {
+                m_overflow_tmp[overflow_offset + i] = 0;
+            }
+        }
+
+        auto& data = m_data[level];
+        data = int_vector<>(n - overflows, 0, bits_next);
+
+        size_t idx_data = 0, idx_recurse = 0;
+        int_vector<> recurse(overflows, 0, max_msb + 1);
+        for (size_t i = 0; i < n; ++i) {
+            if (m_overflow_tmp[overflow_offset + i]) {
+                recurse[idx_recurse++] = c[i];
+            } else {
+                data[idx_data++] = (c[i] * scalar)  - m_table_base[level];
+            }
+        }
+
+        util::bit_compress(data);
+        assert(idx_data == n-overflows);
+        assert(idx_recurse == overflows);
+
+
+        construct_level_scalar(
+                level + 1,
+                overflow_offset + n,
+                bit_sizes,
+                recurse, scalar);
+    }
+
     public:
         // copy-and-swap
         dac_vector_dp_opt() = default;
@@ -273,6 +341,87 @@ class dac_vector_dp_opt
             m_data.resize(bit_sizes.size());
             m_overflow_tmp.resize(total_overflow_size);
             construct_level(0, 0, bit_sizes, c);
+
+            // Initialize iterator_index
+            m_last_pos = 0;
+            m_iter_i.resize(m_data.size()-1, -1);
+        }
+
+
+        // Multiply each value by "scalar"
+        template<class Container>
+        dac_vector_dp_opt(long scalar, Container&& c, int max_levels = t_default_max_levels) {
+            assert(max_levels > 0);
+            m_size = c.size();
+            std::vector<uint64_t> cnt(128, 0);
+            cnt[0] = m_size;
+            int max_msb = 0;
+            for (size_t i = 0; i < m_size; ++i) {
+                auto x = (c[i] * scalar) >> 1;
+                int lvl = 1;
+                while (x > 0) {
+                    cnt[lvl] += 1;
+                    max_msb = std::max(max_msb, lvl);
+                    x >>= 1;
+                    ++lvl;
+                }
+            }
+
+            // f[i][j] = minimum cost for subsequence with MSB >= i, when we can
+            // use up to j levels.
+            double f[max_msb + 2][max_levels + 1];
+            int nxt[max_msb + 2][max_levels + 1];
+            std::fill(f[max_msb + 1], f[max_msb + 1] + max_levels + 1, 0.0);
+            std::fill(nxt[max_msb + 1], nxt[max_msb + 1] + max_levels + 1, -1);
+            for (int b = max_msb; b >= 0; --b) {
+                std::fill(f[b], f[b] + max_levels + 1,
+                          std::numeric_limits<double>::infinity());
+                for (int lvl = 1; lvl <= max_levels; ++lvl) {
+                    for (int b2 = b+1; b2 <= max_msb + 1; ++b2) {
+                        double w = b2*(cnt[b] - cnt[b2]) + f[b2][lvl - 1];
+                        w += b2 == (max_msb + 1) ? 0 : cost(cnt[b], cnt[b2]);
+                        if (w < f[b][lvl]) {
+                            f[b][lvl] = w;
+                            nxt[b][lvl] = b2;
+                        }
+                    }
+                }
+            }
+            std::vector<int> bit_sizes;
+            int b = 0, lvl = max_levels;
+            while (nxt[b][lvl] != -1) {
+                b = nxt[b][lvl];
+                lvl--;
+                bit_sizes.push_back(b);
+            }
+            assert(bit_sizes.size() <= max_levels);
+
+
+            // Create table base
+            {
+                m_table_base.resize(bit_sizes.size());
+                m_table_base[0] = 0;
+                size_t k_val;
+                for (size_t bs = 1; b < bit_sizes.size(); b++) {
+                    k_val = 1 << bit_sizes[bs-1];
+                    m_table_base[b] = m_table_base[bs-1] + k_val;
+                }
+            }
+
+            size_t total_overflow_size = 0;
+            for (size_t i = 0; i < c.size(); ++i) {
+                size_t bs = 0;
+                int msb = bits::hi(c[i] * scalar);
+                ++total_overflow_size;
+                while (bs < bit_sizes.size() && msb >= bit_sizes[bs]) {
+                    ++bs;
+                    ++total_overflow_size;
+                }
+            }
+
+            m_data.resize(bit_sizes.size());
+            m_overflow_tmp.resize(total_overflow_size);
+            construct_level_scalar(0, 0, bit_sizes, c, scalar);
 
             // Initialize iterator_index
             m_last_pos = 0;

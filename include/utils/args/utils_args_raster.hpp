@@ -385,6 +385,53 @@ void parse_args_check_values(int argc, char *const argv[], args_check_values &ar
     }
 }
 
+//**********************************************************************//
+//************************** SHOW INFO *********************************//
+//**********************************************************************//
+struct args_show_info
+{
+    std::string input_file;     // Path to k2-raster.
+};
+
+// Print command line options
+void print_usage_show_info( char *const argv[]) {
+    std::cout << "usage: " + std::string(argv[0]) + " <k2_raster_file>  \n\n" +
+                 "Show info about k2-raster.\n" +
+                 "   <k2_raster_file>: [string] - path to the k2-raster file.\n";
+}
+
+// Parse arguments
+void parse_args_show_info(int argc, char *const argv[], args_show_info &arg)
+{
+    int c;
+    extern char *optarg;
+    extern int optind;
+
+    std::string sarg;
+    while ((c = getopt(argc, argv, "n:h")) != -1)
+    {
+        switch (c)
+        {
+            case 'h':
+                print_usage_show_info(argv);
+                exit(1);
+            case '?':
+                std::cout << "Unknown option. Use -h for help" << std::endl;
+                print_usage_show_info(argv);
+                exit(1);
+        }
+
+    }
+    // the only input parameter is the file name
+    if (argc == optind + 1) {
+        arg.input_file.assign(argv[optind]);
+    } else {
+        std::cout << "Invalid number of arguments" << std::endl;
+        print_usage_show_info(argv);
+        exit(-1);
+    }
+}
+
 
 
 #endif //INCLUDE_UTILS_ARGS_RASTER

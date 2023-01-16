@@ -8,7 +8,7 @@ set(CMAKE_PROJECT_NAME "k2-raster")
 set(PROJECT_CONTACT "fernando.silva@udc.es")
 
 # Change to Debug or Relase
-set(CMAKE_BUILD_TYPE "Debug")
+set(CMAKE_BUILD_TYPE "Release")
 
 #############
 # Version   #
@@ -36,6 +36,23 @@ else()
     message("${LIB_VERSION_STRING}")
     cmake_policy(SET CMP0048 NEW)
     PROJECT(k2-raster VERSION "${LIBRARY_VERSION_FULL}" LANGUAGES CXX)
+endif()
+
+#################################
+# Memory options (only algebra) #
+#################################
+option(MIN_CONSUMPTION_MEMORY "Reduce the memory consumption in algebra operations")
+set(MIN_CONSUMPTION_MEMORY OFF)
+
+if(MIN_CONSUMPTION_MEMORY)
+    add_definitions(-DMIN_CONSUMPTION_MEMORY)
+endif()
+
+option(SHOW_CONSUMPTION_MEMORY "Show the memory consumption in algebra operations")
+set(SHOW_CONSUMPTION_MEMORY OFF)
+if(SHOW_CONSUMPTION_MEMORY)
+    add_definitions(-DSHOW_CONSUMPTION_MEMORY)
+    SET(LIB_MEM_MEASURE malloc_count)
 endif()
 
 #############
@@ -142,6 +159,9 @@ target_link_libraries(get_values_window_k2r sdsl divsufsort divsufsort64)
 add_executable(check_values_window_k2r src/k2_raster_check_values_window.cpp ${SOURCES})
 target_link_libraries(check_values_window_k2r sdsl divsufsort divsufsort64)
 
+add_executable(show_info_k2r src/k2_raster_show_info.cpp ${SOURCES})
+target_link_libraries(show_info_k2r sdsl divsufsort divsufsort64)
+
 ##############
 # k2t-raster #
 ##############
@@ -167,13 +187,19 @@ target_link_libraries(info_tk2r sdsl divsufsort divsufsort64)
 # Algebra   #
 #############
 add_executable(algebra_k2r src/algebra/k2_raster_algebra.cpp ${SOURCES})
-target_link_libraries(algebra_k2r sdsl divsufsort divsufsort64)
+target_link_libraries(algebra_k2r sdsl divsufsort divsufsort64 ${LIB_MEM_MEASURE})
 
 add_executable(algebra_th_k2r src/algebra/k2_raster_thresholding.cpp ${SOURCES})
 target_link_libraries(algebra_th_k2r sdsl divsufsort divsufsort64)
 
 add_executable(algebra_sc_k2r src/algebra/k2_raster_scalar.cpp ${SOURCES})
 target_link_libraries(algebra_sc_k2r sdsl divsufsort divsufsort64)
+
+add_executable(algebra_zonal_k2r src/algebra/k2_raster_zonal.cpp ${SOURCES})
+target_link_libraries(algebra_zonal_k2r sdsl divsufsort divsufsort64 ${LIB_MEM_MEASURE})
+
+add_executable(algebra_zonal_opt_k2r src/algebra/k2_raster_zonal_op.cpp ${SOURCES})
+target_link_libraries(algebra_zonal_opt_k2r sdsl divsufsort divsufsort64)
 
 add_executable(algebra_de_k2r src/algebra/k2_raster_algebra_de.cpp ${SOURCES})
 target_link_libraries(algebra_de_k2r sdsl divsufsort divsufsort64)
@@ -183,12 +209,6 @@ target_link_libraries(algebra_th_de_k2r sdsl divsufsort divsufsort64)
 
 add_executable(algebra_sc_de_k2r src/algebra/k2_raster_scalar_de.cpp ${SOURCES})
 target_link_libraries(algebra_sc_de_k2r sdsl divsufsort divsufsort64)
-
-add_executable(algebra_zonal_k2r src/algebra/k2_raster_zonal.cpp ${SOURCES})
-target_link_libraries(algebra_zonal_k2r sdsl divsufsort divsufsort64)
-
-add_executable(algebra_zonal_opt_k2r src/algebra/k2_raster_zonal_op.cpp ${SOURCES})
-target_link_libraries(algebra_zonal_opt_k2r sdsl divsufsort divsufsort64)
 
 add_executable(algebra_zonal_de_k2r src/algebra/k2_raster_zonal_de.cpp ${SOURCES})
 target_link_libraries(algebra_zonal_de_k2r sdsl divsufsort divsufsort64)

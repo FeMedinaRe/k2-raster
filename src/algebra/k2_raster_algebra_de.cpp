@@ -37,13 +37,15 @@
 //**********************************************************************//
 //************************** ALGEBRA ***********************************//
 //**********************************************************************//
-template<typename k2_raster_type>
-void algebra(k2_raster_type &raster1, k2_raster_type &raster2, std::string &output_data, k2raster::OperationRaster operation, bool set_check) {
+template<typename k2_raster_type,
+        typename k2_raster_in_type = k2_raster_type,
+        typename value_type=int>
+void algebra(k2_raster_in_type &raster1, k2_raster_in_type &raster2, args_algebra &args) {
 
 #ifndef NDEBUG
     // Check if there is a operation with that code
     std::cout <<"Operation: ";
-    switch (operation) {
+    switch (args.operation) {
         case k2raster::OperationRaster::OPERATION_SUM:
             std::cout << "'Sum'" << std::endl;
             break;
@@ -54,7 +56,7 @@ void algebra(k2_raster_type &raster1, k2_raster_type &raster2, std::string &outp
             std::cout << "'Multiplication'" << std::endl;
             break;
         default:
-            std::cout << "No valid operation " << operation << std::endl;
+            std::cout << "No valid operation " << args.operation << std::endl;
             return;
     }
 #endif
@@ -63,44 +65,45 @@ void algebra(k2_raster_type &raster1, k2_raster_type &raster2, std::string &outp
     /* Run operation     */
     /*********************/
     auto t1 = util::time::user::now(); // Start time
-    std::vector<int> data1, data2;
+    std::vector<value_type> data1;
+    std::vector<typename k2_raster_in_type::value_type> data2;
     size_t n_rows1, n_cols1, n_rows2, n_cols2;
     raster1.decompress(data1, n_rows1, n_cols1);
     raster2.decompress(data2, n_rows2, n_cols2);
 
     size_t n_rows = std::min(n_rows1, n_rows2);
     size_t n_cols = std::min(n_cols1, n_cols2);
-    std::vector<int> result(n_rows * n_cols);
+    //std::vector<value_type> result(n_rows * n_cols);
     size_t p = 0;
 
-    switch (operation) {
+    switch (args.operation) {
         case k2raster::OperationRaster::OPERATION_SUM:
             for (size_t r = 0; r < n_rows; r++) {
                 for (size_t c = 0; c < n_cols; c++) {
-                    result[p++] = data1[r * n_cols1 + c] + data2[r * n_cols2 + c];
+                    data1[p++] = (value_type)data1[r * n_cols1 + c] + (value_type)data2[r * n_cols2 + c];
                 }
             }
             break;
         case k2raster::OperationRaster::OPERATION_SUBT:
             for (size_t r = 0; r < n_rows; r++) {
                 for (size_t c = 0; c < n_cols; c++) {
-                    result[p++] = data1[r * n_cols1 + c] - data2[r * n_cols2 + c];
+                    data1[p++] = (value_type)data1[r * n_cols1 + c] - (value_type)data2[r * n_cols2 + c];
                 }
             }
             break;
         case k2raster::OperationRaster::OPERATION_MULT:
             for (size_t r = 0; r < n_rows; r++) {
                 for (size_t c = 0; c < n_cols; c++) {
-                    result[p++] = data1[r * n_cols1 + c] * data2[r * n_cols2 + c];
+                    data1[p++] = (value_type)data1[r * n_cols1 + c] * (value_type)data2[r * n_cols2 + c];
                 }
             }
             break;
         default:
-            std::cout << "No valid operation " << operation << std::endl;
+            std::cout << "No valid operation " << args.operation << std::endl;
             return;
     }
 
-    k2_raster_type k2raster(result, n_rows, n_cols, raster1.k1, raster1.k2, raster1.level_k1, 0);
+    k2_raster_type k2raster(data1, n_rows, n_cols, raster1.k1, raster1.k2, raster1.level_k1, 0);
     auto t2 = util::time::user::now(); // End time
 
     // Print time/space
@@ -109,19 +112,19 @@ void algebra(k2_raster_type &raster1, k2_raster_type &raster2, std::string &outp
     std::cout << " milliseconds." << std::endl;
 
     size_t k2_raster_size = sdsl::size_in_bytes(k2raster);
-    double ratio = (k2_raster_size * 100.) / (k2raster.get_n_rows() * k2raster.get_n_cols() * sizeof(int));
+    double ratio = ((double)k2_raster_size * 100.) / (k2raster.get_n_rows() * k2raster.get_n_cols() * sizeof(int));
     std::cout << "k2-rater space:" << k2_raster_size << " bytes (" << ratio << "%)" << std::endl;
 
     /*********************/
     /* Save structure    */
     /*********************/
-    if (!output_data.empty()) {
+    if (!args.output_data.empty()) {
 #ifndef NDEBUG
-        std::cout << std::endl << "Storing k2-raster structure in file: " << output_data << std::endl;
+        std::cout << std::endl << "Storing k2-raster structure in file: " << args.output_data << std::endl;
 #endif
-        sdsl::store_to_file(k2raster, output_data);
+        sdsl::store_to_file(k2raster, args.output_data);
 #ifndef NDEBUG
-        std::string file_name = std::string(output_data) + ".html";
+        std::string file_name = std::string(args.output_data) + ".html";
         sdsl::write_structure<sdsl::format_type::HTML_FORMAT>(k2raster, file_name);
 #endif
     }
@@ -129,24 +132,25 @@ void algebra(k2_raster_type &raster1, k2_raster_type &raster2, std::string &outp
     /*********************/
     /* Check             */
     /*********************/
-    if (set_check){
+    if (args.set_check){
         std::cout << "Checking k2-raster........" << std::endl;
 
         for (uint x = 0; x < n_rows; x++) {
             for (uint y = 0; y < n_cols; y++) {
-                int result1 = 0 ;
-                switch (operation) {
+                value_type result1 = 0 ;
+                switch (args.operation) {
                     case k2raster::OperationRaster::OPERATION_SUM:
-                        result1 = raster1.get_cell(x, y) + raster2.get_cell(x, y);
+                        result1 = (value_type)raster1.get_cell(x, y) + (value_type)raster2.get_cell(x, y);
                         break;
                     case k2raster::OperationRaster::OPERATION_SUBT:
-                        result1 = raster1.get_cell(x, y) - raster2.get_cell(x, y);
+                        result1 = (value_type)raster1.get_cell(x, y) - (value_type)raster2.get_cell(x, y);
                         break;
                     case k2raster::OperationRaster::OPERATION_MULT:
-                        result1 = raster1.get_cell(x, y) * raster2.get_cell(x, y);
+                        result1 = (value_type)raster1.get_cell(x, y) * (value_type)raster2.get_cell(x, y);
                         break;
                 }
-                if (result1 != k2raster.get_cell(x, y)) {
+                value_type result2 = k2raster.get_cell(x, y);
+                if (result1 != result2) {
                     std::cout << "Found error at position (" << x << ", " << y  << "), ";
                     std::cout << "expected " << result1 << " and get " << k2raster.get_cell(x, y) << std::endl;
                     exit(-1);
@@ -183,8 +187,38 @@ int main(int argc, char **argv) {
             assert(input_file_2.is_open() && input_file_2.good());
             raster2.load(input_file_2);
 
-            algebra<k2raster::k2_raster<>>(raster1, raster2, args.output_data,
-                                           static_cast<k2raster::OperationRaster>(args.operation), args.set_check);
+            // Select if values are stored as integers or long integers
+            bool more_than_int = false;
+            long max_result;
+            switch (args.operation) {
+                case k2raster::OperationRaster::OPERATION_SUM:
+                    max_result = (long)raster1.max_value + (long)raster2.max_value;
+                    break;
+                case k2raster::OperationRaster::OPERATION_SUBT:
+                    max_result = (long)raster1.max_value - (long)raster2.max_value;
+                    break;
+                case k2raster::OperationRaster::OPERATION_MULT:
+                    max_result = (long)raster1.max_value * (long)raster2.max_value;
+                    break;
+            }
+            if (max_result >= std::numeric_limits<int>::max() || max_result <= std::numeric_limits<int>::min()) {
+#ifndef NDEBUG
+                std::cout << "Values are stored as long integers." << std::endl;
+#endif
+                more_than_int = true;
+            }
+#ifndef NDEBUG
+            else {
+                std::cout << "Values are stored as integers." << std::endl;
+            }
+#endif
+            if (more_than_int) {
+                // Store values as Long Integers
+                algebra<k2raster::k2_raster<long>, k2raster::k2_raster<int>, long>(raster1, raster2, args);
+            } else {
+                // Store values as Integers
+                algebra<k2raster::k2_raster<int>, k2raster::k2_raster<int>, int>(raster1, raster2, args);
+            }
             break;
         }
         default:

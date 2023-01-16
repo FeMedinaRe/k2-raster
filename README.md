@@ -31,11 +31,11 @@ sudo apt install cmake g++ git
 
 1. Download the project from the repository.
     ```bash
-    git clone https://gitlab.lbd.org.es/fsilva/k3-lidar
+    git clone https://gitlab.lbd.org.es/fsilva/k2-raster
     ```
 2. Enter the project folder.
     ```bash
-    cd k3-lidar
+    cd k2-lidar
     ```
 3. Run *compile.sh* script:
     ```bash
@@ -182,10 +182,11 @@ Given a region and a range, this query checks if all cell values of the region a
 
 
 ## 3 Temporal raster data
+
+Soon
  
 ### 3.1 Encode
 
-k2_raster_temporal_encode.cpp
 
 #### 3.1.2 Example
 
@@ -195,19 +196,40 @@ k2_raster_temporal_encode.cpp
 
 ### 3.2.1 Obtaining a cell value ([get_cell](src/temporal/k2_raster_temporal_get_cell.cpp))
 
-k2_raster_temporal_get_cells_by_value.cpp
-k2_raster_temporal_get_values_window.cpp
 
 
 ## 4. Map algebra
 
-## 4.1. Algebra operation
+### 4.1. Point Wise operation
 
-Run map algebra between two k<sup>2</sup>-raster.
+Run a point wise operation (sum, subtraction or multiplication) between two k<sup>2</sup>-raster. 
 
 Usage:
  ```bash
- ./algebra_k2r <raster1> <raster2> [-o <operation>] [-s <output>] [-c] [-t <type>]
+ ./algebra_k2r <raster1> <raster2> [-o <operation>] [-s <output>] [-c] [-m] [-t <type>]
+ ```
+
+Where:
+
+* **\<raster1>**: [string] - path to the first k2-raster file.
+* **\<scalar_value>**: [number] - Number to operate with each cell.
+* **-o \<operation>**: [number] - map algebra operation (def. 0). Possible operations are:
+  * 0 ->  Sum.
+  * 1 ->  Subtraction.
+  * 3 ->  Multiplication.
+* **-s \<output>**: [string] - path to the output file where store the raster result.
+* **-c**: [boolean] - Enable checking process. (def. false)\.
+* **-m**: [boolean] - Enable the reduction of consumed memory. (def. false)\.
+* **-t \<type>**: [number] - raster type (def. 10):\n"
+  * 10 ->  hybrid k2-raster.
+  
+### 4.2. Scalar operation
+
+Runa a scalar operation (sum, subtraction or multiplication) to one k<sup>2</sup>-raster.
+
+Usage:
+ ```bash
+ ./algebra_sc_k2r <raster1> <scalar_value>[-o <operation>] [-s <output>] [-c] [-m] [-t <type>] [-r nreps]
  ```
 
 Where:
@@ -215,17 +237,61 @@ Where:
 * **\<raster1>**: [string] - path to the first k2-raster file.
 * **\<raster2>**: [string] - path to the second k2-raster file.
 * **-o \<operation>**: [number] - map algebra operation (def. 0). Possible operations are:
-  * 0 ->  Sum.
-  * 1 ->  Subtraction.
-  * 3 ->  Multiplication.
+    * 0 ->  Sum.
+    * 1 ->  Subtraction.
+    * 3 ->  Multiplication.
 * **-s \<output>**: [string] - path to the output file where store the raster result.
 * **-c**: [boolean] - Enable checking process. (def. false)\.
-* **-t \<type>**: [number] - raster type (def. 10):\n"
-  * 10 ->  hybrid k2-raster.
-  
-## 4.2. Scalar operation
-## 4.3. Thresholding operation
-## 4.4. Zonal operation
+* **-m**: [boolean] - Enable the reduction of consumed memory. (def. false)\.
+* **-t \<type>**: [number] - raster type (def. 10):
+    * 10 ->  hybrid k2-raster.
+* **-r**: [number] - number of executions. (def. 1)\.
+
+
+### 4.3. Thresholding operation
+
+Run a thresholding operation to one k<sup>2</sup>-raster.
+
+Usage:
+ ```bash
+ ./algebra_th_k2r <raster1> <thr_value>[-o <operation>] [-s <output>] [-c] [-m] [-t <type>] [-r nreps]
+ ```
+
+Where:
+
+* **\<raster1>**: [string] - path to the first k2-raster file.
+* **\<thr_value>**: [number] - Number to apply the thresholding.
+* **-s \<output>**: [string] - path to the output file where store the raster result.
+* **-c**: [boolean] - Enable checking process. (def. false)\.
+* **-m**: [boolean] - Enable the reduction of consumed memory. (def. false)\.
+* **-t \<type>**: [number] - raster type (def. 10):
+    * 10 ->  hybrid k2-raster.
+* **-r**: [number] - number of executions. (def. 1)\.
+
+### 4.4. Zonal operation
+
+Run zonal map algebra (sum, subtraction or multiplication) between two k<sup>2</sup>-raster.
+
+Usage:
+ ```bash
+ ./algebra_k2r <raster1> <raster_zonal> [-o <operation>] [-s <output>] [-c] [-m] [-t <type>]
+ ```
+
+Where:
+
+* **\<raster1>**: [string] - path to the first k2-raster file.
+* **\<raster_zonal>**: [string] - path to the zonal k2-raster file.
+* **-o \<operation>**: [number] - map algebra operation (def. 0). Possible operations are:
+    * 0 ->  Sum.
+    * 1 ->  Subtraction.
+    * 3 ->  Multiplication.
+* **-s \<output>**: [string] - path to the output file where store the raster result.
+* **-c**: [boolean] - Enable checking process. (def. false)\.
+* **-m**: [boolean] - Enable the reduction of consumed memory. (def. false)\.
+* **-f**: [boolean] - Enable version 2. (def. false)\.
+* **-t \<type>**: [number] - raster type (def. 10):
+    * 10 ->  hybrid k2-raster.
+
 
 # Publications ##
 

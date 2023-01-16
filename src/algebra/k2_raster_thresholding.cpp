@@ -31,20 +31,23 @@
 // Own libraries
 #include <k2_raster.hpp>
 #include <utils/utils_time.hpp>
+//#include <utils/utils_memory.hpp>
 #include <utils/args/utils_args_algebra.hpp>
 
 //**********************************************************************//
 //************************** ALGEBRA ***********************************//
 //**********************************************************************//
-template<typename k2_raster_type>
-void algebra_thresholding(k2_raster_type &raster1, int threshold_value, std::string &output_data, bool set_check) {
-    // Check if there is a operation with that code
+template<typename k2_raster_type,
+        typename k2_raster_in_type = k2_raster_type,
+        typename value_type=int>
+void algebra_thresholding(k2_raster_in_type &raster1, int threshold_value, args_algebra_thr &args) {
+    // Check if there is an operation with that code
 
     /*********************/
     /* Run operation     */
     /*********************/
     auto t1 = util::time::user::now(); // Start time
-    k2_raster_type k2raster(raster1, threshold_value);
+    k2_raster_type k2raster(raster1, threshold_value, args.set_memory_opt);
     auto t2 = util::time::user::now(); // End time
 
     /*********************/
@@ -63,13 +66,13 @@ void algebra_thresholding(k2_raster_type &raster1, int threshold_value, std::str
     /*********************/
     /* Save structure    */
     /*********************/
-    if (!output_data.empty()) {
+    if (!args.output_data.empty()) {
 #ifndef NDEBUG
-        std::cout << std::endl << "Storing k2-raster structure in file: " << output_data << std::endl;
+        std::cout << std::endl << "Storing k2-raster structure in file: " << args.output_data << std::endl;
 #endif
-        sdsl::store_to_file(k2raster, output_data);
+        sdsl::store_to_file(k2raster, args.output_data);
 #ifndef NDEBUG
-        std::string file_name = std::string(output_data) + ".html";
+        std::string file_name = std::string(args.output_data) + ".html";
         sdsl::write_structure<sdsl::format_type::HTML_FORMAT>(k2raster, file_name);
 #endif
     }
@@ -77,8 +80,18 @@ void algebra_thresholding(k2_raster_type &raster1, int threshold_value, std::str
     /*********************/
     /* Check             */
     /*********************/
-    if (set_check){
-        std::cout << "Checking k2-raster........";
+    if (args.set_check){
+        std::cout << "Checking k2-raster........" << std::endl;
+        if (args.set_memory_opt) {
+            // Memory opt destroy k2raster1 during execution. We need load them again.
+
+            // Load raster 1
+            std::ifstream input_file_1(args.raster1);
+            assert(input_file_1.is_open() && input_file_1.good());
+            raster1.load(input_file_1);
+        }
+
+        // Get size n_rows x n_cols
         uint n_rows = k2raster.get_n_rows();
         uint n_cols = k2raster.get_n_cols();
 
@@ -86,10 +99,10 @@ void algebra_thresholding(k2_raster_type &raster1, int threshold_value, std::str
         for (uint x = 0; x < n_rows; x++) {
             for (uint y = 0; y < n_cols; y++) {
                 int result1 = raster1.get_cell(x, y);
-                int val = k2raster.get_cell(x, y);
+                value_type val = k2raster.get_cell(x, y);
                 if ((result1 >= threshold_value) != val) {
                     std::cout << std::endl;
-                    std:: cout << "Found error at position (" << x << ", " << y <<", expected " << result1 << " and get " << val << std::endl;
+                    std:: cout << "Found error at position (" << x << ", " << y <<"), expected " << result1 << " and get " << val << std::endl;
                     exit(-1);
                 } // ENF IF result1
                 if (val) n_ones++;
@@ -124,7 +137,7 @@ int main(int argc, char **argv) {
 
         switch (args.k2_raster_type) {
             case k2raster::K2_RASTER_TYPE: {
-                algebra_thresholding<k2raster::k2_raster<>>(raster1, args.thr_value, args.output_data, args.set_check);
+                algebra_thresholding<k2raster::k2_raster<ushort>, k2raster::k2_raster<int>, ushort>(raster1, args.thr_value, args);
                 break;
             }
             default:
@@ -140,5 +153,7 @@ int main(int argc, char **argv) {
     std::cout << "[TOTAL] k2-raster - Thresholding time: " << time;
     std::cout << " milliseconds";
     std::cout << " in " << args.n_reps << " executions " << "(avg: " << time / args.n_reps << " milliseconds)" << std::endl;
+
+    //util::print_memory_consumption();
     return 0;
 }

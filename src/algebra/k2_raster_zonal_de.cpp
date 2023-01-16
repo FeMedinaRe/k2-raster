@@ -37,8 +37,11 @@
 //**********************************************************************//
 //************************** ALGEBRA ***********************************//
 //**********************************************************************//
-template<typename k2_raster_type, typename t_value=int>
-void algebra_zonal(k2_raster_type &raster1, k2_raster_type &raster_zonal, const std::string &output_data,
+template<typename k2_raster_type,
+        typename k2_raster_in_type = k2_raster_type,
+        typename value_type=long,
+        typename value_in_type=int>
+void algebra_zonal(k2_raster_in_type &raster1, k2_raster_in_type &raster_zonal, const std::string &output_data,
                    const k2raster::OperationZonalRaster &operation, bool set_check) {
 #ifndef NDEBUG
     // Check if there is am operation with that code
@@ -57,29 +60,55 @@ void algebra_zonal(k2_raster_type &raster1, k2_raster_type &raster_zonal, const 
     /* Run operation     */
     /*********************/
     auto t1 = util::time::user::now(); // Start time
-    std::vector<int> raster_values, zonal_values;
+    std::vector<value_in_type> raster_values, zonal_values;
     size_t n_rows1, n_cols1, n_rows2, n_cols2;
     raster1.decompress(raster_values, n_rows1, n_cols1);
     raster_zonal.decompress(zonal_values, n_rows2, n_cols2);
 
     // Calculate the value of each zone
-    std::map<t_value, t_value> zonal_sum;
-    for (size_t p = 0; p < raster_values.size(); p++) {
+    std::map<value_in_type, value_type> zonal_sum;
+    {
+        size_t p, pz;
+        for (size_t r = 0; r < n_rows1; r++) {
+            for (size_t c = 0; c < n_cols1; c++) {
+                p = r * n_cols1 + c;
+                pz = r * n_cols2 + c;
+                if (zonal_sum.find(zonal_values[pz]) == zonal_sum.end()) {
+                    zonal_sum[zonal_values[pz]] = raster_values[p];
+                } else {
+                    zonal_sum[zonal_values[pz]] += raster_values[p];
+                }
+            }
+        }
+        raster_values.clear();
+        raster_values.shrink_to_fit();
+    } // END BLOCK calculate zonal_sum (map)
+
+    /*for (size_t p = 0; p < raster_values.size(); p++) {
         if (zonal_sum.find(zonal_values[p]) == zonal_sum.end()) {
             zonal_sum[zonal_values[p]] = raster_values[p];
         } else {
             zonal_sum[zonal_values[p]] += raster_values[p];
         }
-    } // END FOR p
+        if (zonal_values[p] == 31) {
+            std::cout << "zone: " << zonal_values[p] << " = " << zonal_sum[zonal_values[p]] << std::endl;
+            std::cout << "(" << p / n_cols2 << ", " << p % n_cols2 << ")" << std::endl;
+        }
+    } // END FOR p*/
 
 
     // Create zonal result
-    for (int & zonal_value : zonal_values) {
-        zonal_value = zonal_sum[zonal_value];
+    std::vector<value_type> result_values(n_rows2*n_cols2);
+    size_t p = 0;
+    for (auto & zonal_value : zonal_values) {
+        result_values[p] = zonal_sum[zonal_value];
+        p++;
     } // END FOR p
+    zonal_values.clear();
+    zonal_values.shrink_to_fit();
 
 
-    k2_raster_type k2raster(zonal_values, n_rows2, n_cols2, raster1.k1, raster1.k2, raster1.level_k1, 0);
+    k2_raster_type k2raster(result_values, n_rows2, n_cols2, raster1.k1, raster1.k2, raster1.level_k1, 0);
     auto t2 = util::time::user::now(); // End time
 
     // Print time/space
@@ -88,7 +117,7 @@ void algebra_zonal(k2_raster_type &raster1, k2_raster_type &raster_zonal, const 
     std::cout << " milliseconds." << std::endl;
 
     size_t k2_raster_size = sdsl::size_in_bytes(k2raster);
-    double ratio = (k2_raster_size * 100.) / (k2raster.get_n_rows() * k2raster.get_n_cols() * sizeof(int));
+    double ratio = (k2_raster_size * 100.) / (k2raster.get_n_rows() * k2raster.get_n_cols() * sizeof(value_in_type));
     std::cout << "k2-rater space:" << k2_raster_size << " bytes (" << ratio << "%)" << std::endl;
 
     /*********************/
@@ -115,10 +144,11 @@ void algebra_zonal(k2_raster_type &raster1, k2_raster_type &raster_zonal, const 
 
         for (size_t x = 0; x < n_rows; x++) {
             for (size_t y = 0; y < n_cols; y++) {
-                t_value zone_value = zonal_sum[raster_zonal.get_cell(x, y)];
-                if (zone_value != k2raster.get_cell(x, y)) {
+                value_type zone_value = zonal_sum[raster_zonal.get_cell(x, y)];
+                value_type cell_value = k2raster.get_cell(x, y);
+                if (zone_value != cell_value) {
                     std::cout << "Found error at position (" << x << ", " << y  << "), ";
-                    std::cout << "expected " << zone_value << " and get " << k2raster.get_cell(x, y) << std::endl;
+                    std::cout << "expected " << zone_value << " and get " << cell_value << std::endl;
                     exit(-1);
                 } // END IF result1
             } // END FOR y
@@ -141,7 +171,7 @@ int main(int argc, char **argv) {
     /*********************/
     switch (args.k2_raster_type) {
         case k2raster::K2_RASTER_TYPE: {
-            k2raster::k2_raster<> raster1, rasterZ;
+            k2raster::k2_raster<int> raster1, rasterZ;
 
             // Load raster 1
             std::ifstream input_file_1(args.raster1);
@@ -153,7 +183,7 @@ int main(int argc, char **argv) {
             assert(input_file_zonal.is_open() && input_file_zonal.good());
             rasterZ.load(input_file_zonal);
 
-            algebra_zonal<k2raster::k2_raster<>>(raster1, rasterZ, args.output_data,
+            algebra_zonal<k2raster::k2_raster<long>, k2raster::k2_raster<int>, long, int>(raster1, rasterZ, args.output_data,
                                            static_cast<k2raster::OperationZonalRaster>(args.operation), args.set_check);
         }
             break;

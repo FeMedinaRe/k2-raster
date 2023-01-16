@@ -32,22 +32,27 @@
 #include <k2_raster.hpp>
 #include <utils/utils_time.hpp>
 #include <utils/args/utils_args_algebra.hpp>
+#ifdef SHOW_CONSUMPTION_MEMORY
+#include <utils/utils_memory.hpp>
+#endif
 
 //**********************************************************************//
 //************************** ALGEBRA ***********************************//
 //**********************************************************************//
-template<typename k2_raster_type, typename t_value=int>
-void algebra_zonal(k2_raster_type &raster1, k2_raster_type &raster_zonal, const std::string &output_data,
-                   const k2raster::OperationZonalRaster &operation, bool set_check) {
+template<typename k2_raster_type,
+        typename k2_raster_in_type = k2_raster_type,
+        typename value_type=long,
+        typename value_in_type=int>
+void algebra_zonal(k2_raster_in_type &raster1, k2_raster_in_type &raster_zonal, const args_algebra_zonal &args) {
 #ifndef NDEBUG
     // Check if there is an operation with that code
     std::cout << "Operation: ";
-    switch (operation) {
+    switch (args.operation) {
         case k2raster::OperationZonalRaster::OPERATION_ZONAL_SUM:
             std::cout << "'Zonal Sum'" << std::endl;
             break;
         default:
-            std::cout << "No valid operation << " << operation << std::endl;
+            std::cout << "No valid operation << " << args.operation << std::endl;
             return;
     }
 #endif
@@ -56,7 +61,7 @@ void algebra_zonal(k2_raster_type &raster1, k2_raster_type &raster_zonal, const 
     /* Run operation     */
     /*********************/
     auto t1 = util::time::user::now(); // Start time
-    k2_raster_type k2raster(raster1, raster_zonal, operation, false);
+    k2_raster_type k2raster(raster1, raster_zonal, args.operation, args.set_version_opt/*, args.set_memory_opt*/);
     auto t2 = util::time::user::now(); // End time
 
     /*********************/
@@ -70,20 +75,20 @@ void algebra_zonal(k2_raster_type &raster1, k2_raster_type &raster_zonal, const 
     // Print space
     size_t k2_raster_size = sdsl::size_in_bytes(k2raster);
     double ratio =
-            ((double) k2_raster_size * 100.) / (k2raster.get_n_rows() * k2raster.get_n_cols() * sizeof(t_value));
+            ((double) k2_raster_size * 100.) / (k2raster.get_n_rows() * k2raster.get_n_cols() * sizeof(value_in_type));
     std::cout << "k2-rater space:" << k2_raster_size << " bytes (" << ratio << "%)" << std::endl;
 
     /*********************/
     /* Save structure    */
     /*********************/
 
-    if (!output_data.empty()) {
+    if (!args.output_data.empty()) {
 #ifndef NDEBUG
-        std::cout << std::endl << "Storing k2-raster structure in file: " << output_data << std::endl;
+        std::cout << std::endl << "Storing k2-raster structure in file: " << args.output_data << std::endl;
 #endif
-        sdsl::store_to_file(k2raster, output_data);
+        sdsl::store_to_file(k2raster, args.output_data);
 #ifndef NDEBUG
-        std::string file_name = std::string(output_data) + ".html";
+        std::string file_name = std::string(args.output_data) + ".html";
         sdsl::write_structure<sdsl::format_type::HTML_FORMAT>(k2raster, file_name);
 #endif
     }
@@ -91,27 +96,47 @@ void algebra_zonal(k2_raster_type &raster1, k2_raster_type &raster_zonal, const 
     /*********************/
     /* Check             */
     /*********************/
-    if (set_check){
+    if (args.set_check){
         std::cout << "Checking k2-raster........" << std::endl;
-        size_t n_rows, n_cols;
-        std::vector<t_value> zonal_values;
-        raster_zonal.decompress(zonal_values, n_rows, n_cols);
-        std::vector<t_value> raster_values;
+
+        if (args.set_memory_opt) {
+            // Memory opt destroy k2raster1 and k2raster2 during execution. We need load them again.
+
+            // Load raster 1
+            std::ifstream input_file_1(args.raster1);
+            assert(input_file_1.is_open() && input_file_1.good());
+            raster1.load(input_file_1);
+
+            // Load raster 2
+            std::ifstream input_file_2(args.raster_zonal);
+            assert(input_file_2.is_open() && input_file_2.good());
+            raster_zonal.load(input_file_2);
+        }
+
+        size_t n_rows, n_cols, nz_rows, nz_cols;
+        std::vector<value_in_type> zonal_values;
+        raster_zonal.decompress(zonal_values, nz_rows, nz_cols);
+        std::vector<value_in_type> raster_values;
         raster1.decompress(raster_values, n_rows, n_cols);
 
         // Calculate the value of each zone
-        std::map<t_value, t_value> zonal_sum;
-        for (size_t p = 0; p < raster_values.size(); p++) {
-            if (zonal_sum.find(zonal_values[p]) == zonal_sum.end()) {
-                zonal_sum[zonal_values[p]] = raster_values[p];
-            } else {
-                zonal_sum[zonal_values[p]] += raster_values[p];
+        std::map<value_in_type, value_type> zonal_sum;
+        size_t p, pz;
+        for (size_t r = 0; r < n_rows; r++) {
+            for(size_t c = 0; c < n_cols; c++) {
+                p = r * n_cols + c;
+                pz = r * nz_cols + c;
+                if (zonal_sum.find(zonal_values[pz]) == zonal_sum.end()) {
+                    zonal_sum[zonal_values[pz]] = raster_values[p];
+                } else {
+                    zonal_sum[zonal_values[pz]] += raster_values[p];
+                }
             }
-        } // END FOR p
+        }
 
         for (size_t x = 0; x < n_rows; x++) {
             for (size_t y = 0; y < n_cols; y++) {
-                t_value zone_value = zonal_sum[raster_zonal.get_cell(x, y)];
+                value_type zone_value = zonal_sum[raster_zonal.get_cell(x, y)];
                 if (zone_value != k2raster.get_cell(x, y)) {
                     std::cout << "Found error at position (" << x << ", " << y  << "), ";
                     std::cout << "expected " << zone_value << " and get " << k2raster.get_cell(x, y) << std::endl;
@@ -137,7 +162,7 @@ int main(int argc, char **argv) {
     /*********************/
     switch (args.k2_raster_type) {
         case k2raster::K2_RASTER_TYPE: {
-            k2raster::k2_raster<> raster1, rasterZ;
+            k2raster::k2_raster<int> raster1, rasterZ;
 
             // Load raster 1
             std::ifstream input_file_1(args.raster1);
@@ -149,9 +174,7 @@ int main(int argc, char **argv) {
             assert(input_file_zonal.is_open() && input_file_zonal.good());
             rasterZ.load(input_file_zonal);
 
-            algebra_zonal<k2raster::k2_raster<>>(raster1, rasterZ, args.output_data,
-                                                 static_cast<k2raster::OperationZonalRaster>(args.operation),
-                                                 args.set_check);
+            algebra_zonal<k2raster::k2_raster<long>, k2raster::k2_raster<int>, long, int>(raster1, rasterZ, args);
             break;
         }
         default:
@@ -159,5 +182,9 @@ int main(int argc, char **argv) {
             print_usage_algebra_zonal(argv);
             exit(-1);
     }
+
+#ifdef SHOW_CONSUMPTION_MEMORY
+    util::print_memory_consumption();
+#endif
     return 0;
 }

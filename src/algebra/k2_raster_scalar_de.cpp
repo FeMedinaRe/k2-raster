@@ -35,13 +35,14 @@
 //**********************************************************************//
 //************************** ALGEBRA ***********************************//
 //**********************************************************************//
-template<typename k2_raster_type>
-void algebra_scalar(k2_raster_type &raster1, const int scalar_value, std::string &output_data, k2raster::OperationRaster operation ,
-                    bool set_check) {
+template<typename k2_raster_type,
+        typename k2_raster_in_type = k2_raster_type,
+        typename value_type=int>
+void algebra_scalar(k2_raster_in_type &raster1, const int scalar_value, const args_algebra_scalar &args) {
 #ifndef NDEBUG
     // Check if there is a operation with that code
     std::cout <<"Operation: ";
-    switch (operation) {
+    switch (args.operation) {
         case k2raster::OperationRaster::OPERATION_SUM:
             std::cout << "'Sum'" << std::endl;
             break;
@@ -52,25 +53,23 @@ void algebra_scalar(k2_raster_type &raster1, const int scalar_value, std::string
             std::cout << "'Multiplication'" << std::endl;
             break;
         default:
-            std::cout << "No valid operation " << operation << std::endl;
+            std::cout << "No valid operation " << args.operation << std::endl;
             return;
     }
 #endif
-
-
 
     /*********************/
     /* Run operation     */
     /*********************/
     k2_raster_type k2raster;
-    std::vector<int> data;
+    std::vector<value_type> data;
     size_t n_rows, n_cols;
 
     auto t1 = util::time::user::now(); // Start time
     raster1.decompress(data, n_rows, n_cols);
 
     for (size_t p = 0; p < n_rows * n_cols; p++) {
-        switch (operation) {
+        switch (args.operation) {
             case k2raster::OperationRaster::OPERATION_SUM:
                 data[p] += scalar_value;
                 break;
@@ -92,19 +91,19 @@ void algebra_scalar(k2_raster_type &raster1, const int scalar_value, std::string
     std::cout << " milliseconds." << std::endl;
 
     size_t k2_raster_size = sdsl::size_in_bytes(k2raster);
-    double ratio = (k2_raster_size * 100.) / (k2raster.get_n_rows() * k2raster.get_n_cols() * sizeof(int));
+    double ratio = ((double)k2_raster_size * 100.) / (k2raster.get_n_rows() * k2raster.get_n_cols() * sizeof(int));
     std::cout << "k2-rater space:" << k2_raster_size << " bytes (" << ratio << "%)" << std::endl;
 
     /*********************/
     /* Save structure    */
     /*********************/
-    if (!output_data.empty()) {
+    if (!args.output_data.empty()) {
 #ifndef NDEBUG
-        std::cout << std::endl << "Storing k2-raster structure in file: " << output_data << std::endl;
+        std::cout << std::endl << "Storing k2-raster structure in file: " << args.output_data << std::endl;
 #endif
-        sdsl::store_to_file(k2raster, output_data);
+        sdsl::store_to_file(k2raster, args.output_data);
 #ifndef NDEBUG
-        std::string file_name = std::string(output_data) + ".html";
+        std::string file_name = std::string(args.output_data) + ".html";
         sdsl::write_structure<sdsl::format_type::HTML_FORMAT>(k2raster, file_name);
 #endif
     }
@@ -112,12 +111,12 @@ void algebra_scalar(k2_raster_type &raster1, const int scalar_value, std::string
     /*********************/
     /* Check             */
     /*********************/
-    if (set_check){
+    if (args.set_check){
         std::cout << "Checking k2-raster........" << std::endl;
         for (size_t x = 0; x < n_rows; x++) {
             for (size_t y = 0; y < n_cols; y++) {
                 int result1 = raster1.get_cell(x, y);
-                switch (operation) {
+                switch (args.operation) {
                     case k2raster::OperationRaster::OPERATION_SUM:
                         result1 += scalar_value;
                         break;
@@ -154,7 +153,7 @@ int main(int argc, char **argv) {
     /* Run algebra       */
     /*********************/
     auto t1 = util::time::user::now(); // Start time
-    for (auto r=0u; r < args.n_reps; r++) {
+    for (size_t r=0; r < args.n_reps; r++) {
         switch (args.k2_raster_type) {
             case k2raster::K2_RASTER_TYPE: {
                 k2raster::k2_raster<> raster1, raster2;
@@ -164,9 +163,50 @@ int main(int argc, char **argv) {
                 assert(input_file_1.is_open() && input_file_1.good());
                 raster1.load(input_file_1);
 
-                algebra_scalar<k2raster::k2_raster<>>(raster1, args.scalar_value, args.output_data,
-                                                      static_cast<k2raster::OperationRaster>(args.operation),
-                                                      args.set_check);
+
+                // Select if values are stored as integers or long integers
+                bool more_than_int = false;
+                long min_result, max_result;
+                switch (args.operation) {
+                    case k2raster::OperationRaster::OPERATION_SUM:
+                        min_result = (long)raster1.min_value + (long)args.scalar_value;
+                        max_result = (long)raster1.max_value + (long)args.scalar_value;
+                        break;
+                    case k2raster::OperationRaster::OPERATION_SUBT:
+                        min_result = (long)raster1.min_value - (long)args.scalar_value;
+                        max_result = (long)raster1.max_value - (long)args.scalar_value;
+                        break;
+                    case k2raster::OperationRaster::OPERATION_MULT:
+                        min_result = (long)raster1.min_value * (long)args.scalar_value;
+                        max_result = (long)raster1.max_value * (long)args.scalar_value;
+                        break;
+                    default:
+                        std::cout << "Invalid operation " << args.operation << ": " << std::endl;
+                        print_usage_algebra_scalar(argv);
+                        exit(-1);
+                }
+
+                if (max_result >= std::numeric_limits<int>::max() ||
+                    min_result <= std::numeric_limits<int>::min() ||
+                    max_result - min_result >= std::numeric_limits<int>::max()) {
+#ifndef NDEBUG
+                    std::cout << "Values are stored as long integers." << std::endl;
+#endif
+                    more_than_int = true;
+                }
+#ifndef NDEBUG
+                else {
+                    std::cout << "Values are stored as integers." << std::endl;
+                }
+#endif
+
+                if (more_than_int) {
+                    // Store values as Long Integers
+                    algebra_scalar<k2raster::k2_raster<long>, k2raster::k2_raster<int>, long>(raster1, args.scalar_value, args);
+                } else {
+                    // Store values as Integers
+                    algebra_scalar<k2raster::k2_raster<>>(raster1, args.scalar_value, args);
+                }
             }
                 break;
             default:

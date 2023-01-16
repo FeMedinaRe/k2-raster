@@ -51,7 +51,7 @@ struct args_encode_temporal
     ushort      type = k2raster::ATH_K2_RASTER_TYPE;        // Raster type
     uint        snap_freq=10;                               // Frequency of a snapshot in the temporal serie.
     ushort      scale_factor=0;                             // Input values are converted as: value *  10^scale_factor
-    bool        set_check = false;                          // Enable checking processs
+    bool        set_check = false;                          // Enable checking process
 };
 
 // Print command line options
@@ -115,7 +115,7 @@ void parse_args_encode_temporal(int argc, char *const argv[], args_encode_tempor
     // the only input parameter is the file name
     if (argc == optind + 3) {
         arg.input_file.assign(argv[optind]);
-        arg.input_folder.assign(argv[optind]+1);
+        arg.input_folder.assign(argv[optind+1]);
         arg.output_data.assign(argv[optind+2]);
     } else {
         std::cout << "Invalid number of arguments" << std::endl;
@@ -134,9 +134,10 @@ void parse_args_encode_temporal(int argc, char *const argv[], args_encode_tempor
             // Check snapshot frequency
             if (arg.snap_freq < 1) {
                 std::cout << "[Error] - No valid value snap_freq =  " << arg.snap_freq << ". Should be greater or equal to 1" << std::endl;
+                print_usage_encode_temporal(argv);
+                exit(-1);
             }
-            print_usage_encode_temporal(argv);
-            exit(-1);
+
         case k2raster::AT_K2_RASTER_TYPE:
         case k2raster::ATH_K2_RASTER_TYPE:
         case k2raster::K2_RASTER_TEMPORAL_GLOBAL_TYPE:

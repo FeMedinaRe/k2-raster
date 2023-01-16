@@ -42,27 +42,29 @@
 //**********************************************************************//
 struct args_algebra
 {
-    std::string raster1;                                    // Path to raster 1
-    std::string raster2;                                    // Path to raster 2
-    std::string output_data;                                // Path to the output file where store the raster result
-    ushort      operation=0;                                // Operation (number)
-    bool        set_check = false;                          // Enable checking process
-    ushort      k2_raster_type = k2raster::K2_RASTER_TYPE;  // Raster type (remove)
+    std::string raster1;                                            // Path to raster 1
+    std::string raster2;                                            // Path to raster 2
+    std::string output_data;                                        // Path to the output file where store the raster result
+    k2raster::OperationRaster operation=k2raster::OPERATION_SUM;    // Operation (number)
+    bool        set_check = false;                                  // Enable checking process
+    bool        set_memory_opt=false;                               // Reduce memory consumption
+    ushort      k2_raster_type = k2raster::K2_RASTER_TYPE;          // Raster type (remove)
 };
 
 // Print command line options
 void print_usage_algebra( char *const argv[]) {
-    std::cout << "usage: " + std::string(argv[0]) + " <raster1> <raster2> [-o <operation>] [-s <output>] [-c] [-t <type>]  \n\n" +
+    std::cout << "usage: " + std::string(argv[0]) + " <raster1> <raster2> [-o <operation>] [-s <output>] [-c] [-m] [-t <type>]  \n\n" +
                  "Run map algebra between two k2-raster.\n" +
-                 "   raster1: [string] - path to the first k2-raster file\n" +
-                 "   raster2: [string] - path to the second k2-raster file\n" +
-                 "   -o operation: [number] - map algebra operation (def. 0):\n" +
+                 "   raster1: [string] - Path to the first k2-raster file\n" +
+                 "   raster2: [string] - Path to the second k2-raster file\n" +
+                 "   -o operation: [number] - Map algebra operation (def. 0):\n" +
                  "                           " + std::to_string(k2raster::OperationRaster::OPERATION_SUM) + " ->  Sum\n" +
                  "                           " + std::to_string(k2raster::OperationRaster::OPERATION_SUBT) + " ->  Subtraction\n" +
                  "                           " + std::to_string(k2raster::OperationRaster::OPERATION_MULT) + " ->  Multiplication\n" +
                  "   -s output: [string] - path to the output file where store the raster result\n" +
-                 "   -c: [boolean] - enable checking process. (def. false)\n" +
-                 "   -t type: [number] - raster type (def. 0):\n"
+                 "   -c: [boolean] - Enable checking process. (def. false)\n" +
+                 "   -m: [boolean] - Enable the reduction of consumed memory. (def. false)\n" +
+                 "   -t type: [number] - Raster type (def. 0):\n"
                  "                           " + std::to_string(k2raster::K2_RASTER_TYPE) + " ->  hybrid k2-raster.\n";
 }
 
@@ -74,19 +76,33 @@ void parse_args_algebra(int argc, char *const argv[], args_algebra &arg)
     extern int optind;
 
     std::string sarg;
-    while ((c = getopt(argc, argv, "o:s:ct:h")) != -1)
+    while ((c = getopt(argc, argv, "o:s:cmt:h")) != -1)
     {
         switch (c)
         {
             case 'o':
                 sarg.assign(optarg);
-                arg.operation = stoi(sarg);
+                // Check if there is an operation with that code
+                switch (stoi(sarg)) {
+                    case k2raster::OperationRaster::OPERATION_SUM:
+                    case k2raster::OperationRaster::OPERATION_SUBT:
+                    case k2raster::OperationRaster::OPERATION_MULT:
+                        break;
+                    default:
+                        std::cout << "[Error] - No valid operation " << stoi(sarg) << std::endl;
+                        print_usage_algebra(argv);
+                        exit(-1);
+                }
+                arg.operation = static_cast<k2raster::OperationRaster>(stoi(sarg));
                 break;
             case 's':
                 arg.output_data.assign(optarg);
                 break;
             case 'c':
                 arg.set_check = true;
+                break;
+            case 'm':
+                arg.set_memory_opt = true;
                 break;
             case 't':
                 sarg.assign(optarg);
@@ -134,18 +150,19 @@ void parse_args_algebra(int argc, char *const argv[], args_algebra &arg)
 //**********************************************************************//
 struct args_algebra_scalar
 {
-    std::string raster1;                                    // Path to raster 1
-    int         scalar_value;                               // Integer value
-    std::string output_data;                                // Path to the output file where store the raster result
-    ushort      operation=0;                                // Operation (number)
-    bool        set_check = false;                          // Enable checking process
-    ushort      k2_raster_type = k2raster::K2_RASTER_TYPE;  // Raster type (remove)
-    uint        n_reps=1;                                   // Number of executions
+    std::string raster1;                                            // Path to raster 1
+    int         scalar_value;                                       // Integer value
+    std::string output_data;                                        // Path to the output file where store the raster result
+    k2raster::OperationRaster operation=k2raster::OPERATION_SUM;    // Operation (number)
+    bool        set_check = false;                                  // Enable checking process
+    bool        set_memory_opt=false;                               // Reduce memory consumption
+    ushort      k2_raster_type = k2raster::K2_RASTER_TYPE;          // Raster type (remove)
+    uint        n_reps=1;                                           // Number of executions
 };
 
 // Print command line options
 void print_usage_algebra_scalar( char *const argv[]) {
-    std::cout << "usage: " + std::string(argv[0]) + " raster1 scalar_value [-o operation] [-s output] [-c] [-t type] [-r nreps] \n\n" +
+    std::cout << "usage: " + std::string(argv[0]) + " raster1 scalar_value [-o operation] [-s output] [-c] [-m] [-t type] [-r nreps] \n\n" +
                  "Run a scalar operation to one k2-raster.\n" +
                  "   raster1: [string] - path to the first k2-raster file\n" +
                  "   scalar_value: [number] - Number to operate with each cell\n" +
@@ -155,6 +172,7 @@ void print_usage_algebra_scalar( char *const argv[]) {
                  "                           " + std::to_string(k2raster::OperationRaster::OPERATION_MULT) + " ->  Multiplication\n" +
                  "   -s output: [string] - path to the output file where store the raster result\n" +
                  "   -c: [boolean] - enable checking process. (def. false)\n" +
+                 "   -m: [boolean] - Enable the reduction of consumed memory. (def. false)\n" +
                  "   -t type: [number] - raster type (def. 0):\n"
                  "                           " + std::to_string(k2raster::K2_RASTER_TYPE) + " ->  hybrid k2-raster.\n" +
                  "   -r: [number] - number of executions. (def. 1)\n";
@@ -168,19 +186,33 @@ void parse_args_algebra_scalar(int argc, char *const argv[], args_algebra_scalar
     extern int optind;
 
     std::string sarg;
-    while ((c = getopt(argc, argv, "o:s:ct:r:h")) != -1)
+    while ((c = getopt(argc, argv, "o:s:cmt:r:h")) != -1)
     {
         switch (c)
         {
             case 'o':
                 sarg.assign(optarg);
-                arg.operation = stoi(sarg);
+                // Check if there is an operation with that code
+                switch (stoi(sarg)) {
+                    case k2raster::OperationRaster::OPERATION_SUM:
+                    case k2raster::OperationRaster::OPERATION_SUBT:
+                    case k2raster::OperationRaster::OPERATION_MULT:
+                        break;
+                    default:
+                        std::cout << "[Error] - No valid operation " << stoi(sarg) << std::endl;
+                        print_usage_algebra(argv);
+                        exit(-1);
+                }
+                arg.operation = static_cast<k2raster::OperationRaster>(stoi(sarg));
                 break;
             case 's':
                 arg.output_data.assign(optarg);
                 break;
             case 'c':
                 arg.set_check = true;
+                break;
+            case 'm':
+                arg.set_memory_opt = true;
                 break;
             case 't':
                 sarg.assign(optarg);
@@ -242,6 +274,7 @@ struct args_algebra_thr
     int         thr_value;                                  // Integer value
     std::string output_data;                                // Path to the output file where store the raster result
     bool        set_check = false;                          // Enable checking process
+    bool        set_memory_opt=false;                       // Reduce memory consumption
     ushort      k2_raster_type = k2raster::K2_RASTER_TYPE;  // Raster type (remove)
     uint        n_reps=1;                                   // Number of executions
 };
@@ -254,6 +287,7 @@ void print_usage_algebra_thr( char *const argv[]) {
                  "   thr_value: [number] - Number to apply the thresholding\n" +
                  "   -s output: [string] - path to the output file where store the raster result\n" +
                  "   -c: [boolean] - enable checking process. (def. false)\n" +
+                 "   -m: [boolean] - Enable the reduction of consumed memory. (def. false)\n" +
                  "   -t type: [number] - raster type (def. 0):\n"
                  "                           " + std::to_string(k2raster::K2_RASTER_TYPE) + " ->  hybrid k2-raster.\n" +
                  "   -r: [number] - number of executions. (def. 1)\n";
@@ -268,7 +302,7 @@ void parse_args_algebra_thr(int argc, char *const argv[], args_algebra_thr &arg)
     extern int optind;
 
     std::string sarg;
-    while ((c = getopt(argc, argv, "s:ct:r:h")) != -1)
+    while ((c = getopt(argc, argv, "s:cmt:r:h")) != -1)
     {
         switch (c)
         {
@@ -277,6 +311,9 @@ void parse_args_algebra_thr(int argc, char *const argv[], args_algebra_thr &arg)
                 break;
             case 'c':
                 arg.set_check = true;
+                break;
+            case 'm':
+                arg.set_memory_opt = true;
                 break;
             case 't':
                 sarg.assign(optarg);
@@ -322,12 +359,14 @@ void parse_args_algebra_thr(int argc, char *const argv[], args_algebra_thr &arg)
 //**********************************************************************//
 struct args_algebra_zonal
 {
-    std::string raster1;                                    // Path to raster 1
-    std::string raster_zonal;                               // Path to zonal raster
-    std::string output_data;                                // Path to the output file where store the raster result
-    ushort      operation=0;                                // Operation (number)
-    bool        set_check = false;                          // Enable checking process
-    ushort      k2_raster_type = k2raster::K2_RASTER_TYPE;  // Raster type (remove)
+    std::string raster1;                                                    // Path to raster 1
+    std::string raster_zonal;                                               // Path to zonal raster
+    std::string output_data;                                                // Path to the output file where store the raster result
+    k2raster::OperationZonalRaster operation=k2raster::OPERATION_ZONAL_SUM; // Operation (number)
+    bool        set_check = false;                                          // Enable checking process
+    bool        set_memory_opt=false;                                       // Reduce memory consumption
+    bool        set_version_opt=false;                                       // Version 2
+    ushort      k2_raster_type = k2raster::K2_RASTER_TYPE;                  // Raster type (remove)
 };
 
 // Print command line options
@@ -335,13 +374,15 @@ void print_usage_algebra_zonal( char *const argv[]) {
     std::cout << "usage: " + std::string(argv[0]) + " raster1 raster_zonal [-o operation] [-s output] [-c] [-t type]  \n\n" +
                  "Run zonal map algebra between two k2-raster.\n" +
                  "   raster1: [string] - path to the first k2-raster file\n" +
-                 "   raster2: [string] - path to the second k2-raster file\n" +
+                 "   raster_zonal: [string] - path to the zonal k2-raster file\n" +
                  "   -o operation: [number] - map algebra operation (def. 0):\n" +
                  "                           " + std::to_string(k2raster::OperationRaster::OPERATION_SUM) + " ->  Sum\n" +
                  "                           " + std::to_string(k2raster::OperationRaster::OPERATION_SUBT) + " ->  Subtraction\n" +
                  "                           " + std::to_string(k2raster::OperationRaster::OPERATION_MULT) + " ->  Multiplication\n" +
                  "   -s output: [string] - path to the output file where store the raster result\n" +
                  "   -c: [boolean] - enable checking process. (def. false)\n" +
+                 "   -f: [boolean] - enable version 2. (def. false)\n" +
+                 "   -m: [boolean] - Enable the reduction of consumed memory. (def. false)\n" +
                  "   -t type: [number] - raster type (def. 0):\n"
                  "                           " + std::to_string(k2raster::K2_RASTER_TYPE) + " ->  hybrid k2-raster.\n";
 }
@@ -354,19 +395,34 @@ void parse_args_algebra_zonal(int argc, char *const argv[], args_algebra_zonal &
     extern int optind;
 
     std::string sarg;
-    while ((c = getopt(argc, argv, "o:s:ct:h")) != -1)
+    while ((c = getopt(argc, argv, "o:s:cmft:h")) != -1)
     {
         switch (c)
         {
             case 'o':
                 sarg.assign(optarg);
-                arg.operation = stoi(sarg);
+                // Check if there is an operation with that code
+                switch (stoi(sarg)) {
+                    case k2raster::OperationZonalRaster::OPERATION_ZONAL_SUM:
+                        break;
+                    default:
+                        std::cout << "[Error] - No valid operation " << stoi(sarg) << std::endl;
+                        print_usage_algebra(argv);
+                        exit(-1);
+                }
+                arg.operation = static_cast<k2raster::OperationZonalRaster>(stoi(sarg));
                 break;
             case 's':
                 arg.output_data.assign(optarg);
                 break;
             case 'c':
                 arg.set_check = true;
+                break;
+            case 'm':
+                arg.set_memory_opt = true;
+                break;
+            case 'f':
+                arg.set_version_opt = true;
                 break;
             case 't':
                 sarg.assign(optarg);

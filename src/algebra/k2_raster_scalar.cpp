@@ -31,18 +31,20 @@
 // Own libraries
 #include <k2_raster.hpp>
 #include <utils/utils_time.hpp>
+//#include <utils/utils_memory.hpp>
 #include <utils/args/utils_args_algebra.hpp>
 
 //**********************************************************************//
 //************************** ALGEBRA ***********************************//
 //**********************************************************************//
-template<typename k2_raster_type>
-void algebra_scalar(k2_raster_type &raster1, const int scalar_value, std::string &output_data, k2raster::OperationRaster operation ,
-                    bool set_check) {
+template<typename k2_raster_type,
+        typename k2_raster_in_type = k2_raster_type,
+        typename value_type=int>
+void algebra_scalar(k2_raster_in_type &raster1, const value_type scalar_value, args_algebra_scalar &args) {
 #ifndef NDEBUG
     // Check if there is a operation with that code
     std::cout <<"Operation: ";
-    switch (operation) {
+    switch (args.operation) {
         case k2raster::OperationRaster::OPERATION_SUM:
             std::cout << "'Sum'" << std::endl;
             break;
@@ -53,7 +55,7 @@ void algebra_scalar(k2_raster_type &raster1, const int scalar_value, std::string
             std::cout << "'Multiplication'" << std::endl;
             break;
         default:
-            std::cout << "No valid operation " << operation << std::endl;
+            std::cout << "No valid operation " << args.operation << std::endl;
             return;
     }
 #endif
@@ -62,7 +64,7 @@ void algebra_scalar(k2_raster_type &raster1, const int scalar_value, std::string
     /* Run operation     */
     /*********************/
     auto t1 = util::time::user::now(); // Start time
-    k2_raster_type k2raster(raster1, scalar_value, operation);
+    k2_raster_type k2raster(raster1, scalar_value, args.operation, args.set_memory_opt);
     auto t2 = util::time::user::now(); // End time
 
     /*********************/
@@ -81,13 +83,13 @@ void algebra_scalar(k2_raster_type &raster1, const int scalar_value, std::string
     /*********************/
     /* Save structure    */
     /*********************/
-    if (!output_data.empty()) {
+    if (!args.output_data.empty()) {
 #ifndef NDEBUG
-        std::cout << std::endl << "Storing k2-raster structure in file: " << output_data << std::endl;
+        std::cout << std::endl << "Storing k2-raster structure in file: " << args.output_data << std::endl;
 #endif
-        sdsl::store_to_file(k2raster, output_data);
+        sdsl::store_to_file(k2raster, args.output_data);
 #ifndef NDEBUG
-        std::string file_name = std::string(output_data) + ".html";
+        std::string file_name = std::string(args.output_data) + ".html";
         sdsl::write_structure<sdsl::format_type::HTML_FORMAT>(k2raster, file_name);
 #endif
     }
@@ -95,15 +97,24 @@ void algebra_scalar(k2_raster_type &raster1, const int scalar_value, std::string
     /*********************/
     /* Check             */
     /*********************/
-    if (set_check){
+    if (args.set_check){
         std::cout << "Checking k2-raster........" << std::endl;
+        if (args.set_memory_opt) {
+            // Memory opt destroy k2raster1 and k2raster2 during execution. We need load them again.
+
+            // Load raster 1
+            std::ifstream input_file_1(args.raster1);
+            assert(input_file_1.is_open() && input_file_1.good());
+            raster1.load(input_file_1);
+        }
+
         uint n_rows = k2raster.get_n_rows();
         uint n_cols = k2raster.get_n_cols();
 
         for (uint x = 0; x < n_rows; x++) {
             for (uint y = 0; y < n_cols; y++) {
-                int result1 = raster1.get_cell(x, y);
-                switch (operation) {
+                value_type result1 = raster1.get_cell(x, y);
+                switch (args.operation) {
                     case k2raster::OperationRaster::OPERATION_SUM:
                         result1 += scalar_value;
                         break;
@@ -115,7 +126,7 @@ void algebra_scalar(k2_raster_type &raster1, const int scalar_value, std::string
                         break;
                 }
 
-                int val = k2raster.get_cell(x, y);
+                value_type val = k2raster.get_cell(x, y);
                 if (result1 != val) {
                     std::cout << "Found error at position (" << x << ", " << y  << "), ";
                     std::cout << "expected " << result1 << " and get " << val << std::endl;
@@ -140,18 +151,59 @@ int main(int argc, char **argv) {
     /* Run algebra       */
     /*********************/
     auto t1 = util::time::user::now(); // Start time
-    for (auto r=0u; r < args.n_reps; r++) {
+    for (size_t r=0; r < args.n_reps; r++) {
         switch (args.k2_raster_type) {
             case k2raster::K2_RASTER_TYPE: {
-                k2raster::k2_raster<> raster1, raster2;
+                k2raster::k2_raster<> raster1;
 
                 // Load raster 1
                 std::ifstream input_file_1(args.raster1);
                 assert(input_file_1.is_open() && input_file_1.good());
                 raster1.load(input_file_1);
 
-                algebra_scalar<k2raster::k2_raster<>>(raster1, args.scalar_value, args.output_data,
-                        static_cast<k2raster::OperationRaster>(args.operation), args.set_check);
+                // Select if values are stored as integers or long integers
+                bool more_than_int = false;
+                long min_result, max_result;
+                switch (args.operation) {
+                    case k2raster::OperationRaster::OPERATION_SUM:
+                        min_result = (long)raster1.min_value + (long)args.scalar_value;
+                        max_result = (long)raster1.max_value + (long)args.scalar_value;
+                        break;
+                    case k2raster::OperationRaster::OPERATION_SUBT:
+                        min_result = (long)raster1.min_value - (long)args.scalar_value;
+                        max_result = (long)raster1.max_value - (long)args.scalar_value;
+                        break;
+                    case k2raster::OperationRaster::OPERATION_MULT:
+                        min_result = (long)raster1.min_value * (long)args.scalar_value;
+                        max_result = (long)raster1.max_value * (long)args.scalar_value;
+                        break;
+                    default:
+                        std::cout << "Invalid operation " << args.operation << ": " << std::endl;
+                        print_usage_algebra_scalar(argv);
+                        exit(-1);
+                }
+
+                if (max_result >= std::numeric_limits<int>::max() ||
+                    min_result <= std::numeric_limits<int>::min() ||
+                    max_result - min_result >= std::numeric_limits<int>::max()) {
+#ifndef NDEBUG
+                    std::cout << "Values are stored as long integers." << std::endl;
+#endif
+                    more_than_int = true;
+                }
+#ifndef NDEBUG
+                else {
+                std::cout << "Values are stored as integers." << std::endl;
+            }
+#endif
+
+                if (more_than_int) {
+                    // Store values as Long Integers
+                    algebra_scalar<k2raster::k2_raster<long>, k2raster::k2_raster<int>, long>(raster1, args.scalar_value, args);
+                } else {
+                    // Store values as Integers
+                    algebra_scalar<k2raster::k2_raster<>>(raster1, args.scalar_value, args);
+                }
             }
                 break;
             default:
@@ -167,5 +219,7 @@ int main(int argc, char **argv) {
     std::cout << "[TOTAL] k2-raster - Scalar time: " << time;
     std::cout << " milliseconds";
     std::cout << " in " << args.n_reps << " executions " << "(avg: " << time / args.n_reps << " milliseconds)" << std::endl;
+
+    //util::print_memory_consumption();
     return 0;
 }
