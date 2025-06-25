@@ -30,6 +30,7 @@
 #include <utils/utils_time.hpp>
 #include <k2_raster_heuristic.hpp>
 #include <utils/args/utils_args_raster.hpp>
+#include <fstream>
 
 template<typename k2_raster_type>
 void run_queries(std::string k2raster_filename, const std::string &query_filename, bool set_check, uint n_reps=1) {
@@ -43,7 +44,6 @@ void run_queries(std::string k2raster_filename, const std::string &query_filenam
     assert(query_file.is_open() && query_file.good());
 
     while (query_file.good()) {
-
         k2raster::query<false, false> query(query_file, false);
         if (query_file.good()) {
             queries.push_back(query);
@@ -59,6 +59,12 @@ void run_queries(std::string k2raster_filename, const std::string &query_filenam
     /*********************/
     /* Run queries       */
     /*********************/
+
+    std::ofstream out_bin("results.bin", std::ios::binary | std::ios::out);
+    if (!out_bin.is_open()) {
+        std::cerr << "No se pudo abrir el archivo de salida: results.bin" << std::endl;
+        exit(-1);
+    }
 
     auto t1 = util::time::user::now(); // Start time
     size_t total_num_cells;
@@ -78,6 +84,8 @@ void run_queries(std::string k2raster_filename, const std::string &query_filenam
             q++;
 #endif
 
+            out_bin.write(reinterpret_cast<const char*>(result.data()), result.size() * sizeof(int));
+
             if (set_check) {
                 int value, value2;
                 // Check region
@@ -96,6 +104,7 @@ void run_queries(std::string k2raster_filename, const std::string &query_filenam
             } // END IF set_check
         }
     }
+    out_bin.close();
     auto t2 = util::time::user::now(); // End time
 
     { // Print Info

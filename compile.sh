@@ -16,6 +16,6 @@ echo "Run CMake"
 cmake -DCMAKE_BUILD_TYPE=Release ..
 
 echo "Run make"
-make
+make -j20
 
 echo "DONE!!!"
