@@ -7,14 +7,17 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-  <div class="canvas-container" style="display: flex; gap: 24px; align-items: flex-start;">
-    <div>
-      <h2>Raster out</h2>
-      <canvas id="rasterCanvasOut" width="600" height="600"></canvas>
+  <div class="canvas-container">
+    <div class="navigation">
+      <button id="prevBtn">← Anterior</button>
+      <span id="levelInfo">Original (sin reescalado)</span>
+      <button id="nextBtn">Siguiente →</button>
     </div>
-    <div>
-      <h2>Raster in</h2>
-      <canvas id="rasterCanvasIn" width="600" height="600"></canvas>
+    <div class="raster-display">
+      <canvas id="rasterCanvas" width="640" height="640"></canvas>
+    </div>
+    <div class="level-indicator">
+      <span id="levelDetails">Resolución: 640x640</span>
     </div>
   </div>
   <script type="module" src="viewer.js"></script>
