@@ -1,4 +1,4 @@
-k<sup>2</sup>-raster -  A compacta data strucutre for raster data
+k<sup>2</sup>-raster -  A compact data strucutre for raster data
 =========================
 
 The k<sup>2</sup>-raster is structure for representing raster datasets that uses compressed space and offers indexing capabilities, thus, improving query times over the raster data.
