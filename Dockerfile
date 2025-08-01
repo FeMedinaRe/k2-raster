@@ -2,7 +2,7 @@ FROM debian:11
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 1. Instalar herramientas necesarias
+# Instalar herramientas necesarias
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
@@ -15,45 +15,42 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Instalar NumPy
+# Instalar numpy
 RUN pip3 install numpy
 
-# 3. Crear directorio de trabajo y clonar repositorio
+# Crear directorio de trabajo
 WORKDIR /app
-RUN git clone https://github.com/FeMedinaRe/k2-raster.git
 
-# 4. Entrar a la carpeta del proyecto
-WORKDIR /app/k2-raster
+# Copiar todo el contenido del proyecto al contenedor
+COPY . /app
 
-# 5. Compilar proyecto
-RUN sh compile.sh
+# Compilar el proyecto y generar la matriz
+RUN sh compile.sh && python3 crearMatriz.py
 
-# 6. Ejecutar script Python para crear raster.bin
-RUN python3 crearMatriz.py
+# Copiar archivo raster.bin al directorio de binarios
+RUN cp raster.bin build/bin/
 
-# 7. Mover raster.bin a la carpeta ./build/bin
-RUN mv raster.bin build/bin/
+# Ir al directorio de binarios
+WORKDIR /app/build/bin
 
-# 8. Ejecutar encode_k2r con parámetros
-WORKDIR /app/k2-raster/build/bin
+# Ejecutar el codificador
 RUN ./encode_k2r raster.bin 640 640 raster.k2r -c -t 10 -k 2 -l 6
 
-# 9. Crear query.txt con contenido "0 639 0 639"
+# Crear archivo query.txt
 RUN echo "0 639 0 639" > query.txt
 
-# 10. Ejecutar get_values_window_k2r
+# Ejecutar la consulta
 RUN ./get_values_window_k2r raster.k2r query.txt
 
-# 11. Mover results.bin al frontend
-RUN mv results.bin /app/k2-raster/frontend/
+# Mover archivo resultante a la carpeta frontend
+RUN mv results.bin /app/frontend/
 
-# 12. Configurar Apache para servir el frontend directamente
-RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /app/k2-raster/frontend|' /etc/apache2/sites-available/000-default.conf \
- && sed -i 's|<Directory /var/www/>|<Directory /app/k2-raster/frontend>|' /etc/apache2/apache2.conf \
- && echo "ServerName localhost" >> /etc/apache2/apache2.conf
+# Configurar Apache para servir la carpeta frontend como DocumentRoot
+RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /app/frontend|' /etc/apache2/sites-available/000-default.conf \
+ && sed -i 's|<Directory /var/www/>|<Directory /app/frontend>|' /etc/apache2/apache2.conf
 
-# 13. Exponer puerto 80
+# Exponer el puerto 80
 EXPOSE 80
 
-# 14. Iniciar Apache en primer plano
+# Iniciar Apache en primer plano
 CMD ["apachectl", "-D", "FOREGROUND"]
