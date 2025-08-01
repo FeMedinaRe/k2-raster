@@ -345,6 +345,10 @@ git clone https://github.com/FeMedinaRe/k2-raster
 
 ### 2. ¿Cómo crear la imagen Docker?
 
+* Ingresar a la carpeta k2-raster
+```bash
+cd k2-raster
+```
 * Ejecutar el siguiente comando:
 ```bash
 docker build -t k2raster .
@@ -361,4 +365,4 @@ docker run -d -p 8080:80 k2raster
 
 * Acceder a la IP del dispositivo donde se está ejecutando el contenedor y agregar el puerto asignado previamente:
 
-localhost:8080
+`localhost:8080`
