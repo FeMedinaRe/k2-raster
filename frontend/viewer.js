@@ -1,6 +1,7 @@
 let currentLevel = 0; // 0 = original, 1-6 = niveles
 let rasterData = null;
 const originalSize = 640;
+let isRasterLoaded = false;
 
 const levelInfo = [
   { name: "Original (sin reescalado)", details: "Resolución: 640x640" },
@@ -12,13 +13,68 @@ const levelInfo = [
   { name: "Nivel 6", details: "2x2 bloques (320x320 píxeles cada uno)" }
 ];
 
-async function loadRasterData() {
-  const response = await fetch("raster.bin");
-  const buffer = await response.arrayBuffer();
-  rasterData = new Int32Array(buffer);
+async function loadRasterFromFile(file) {
+  try {
+    const buffer = await file.arrayBuffer();
+    rasterData = new Int32Array(buffer);
+    isRasterLoaded = true;
+    
+    // Actualiza el estado del archivo
+    document.getElementById("fileStatus").textContent = `Archivo cargado: ${file.name}`;
+    document.getElementById("fileStatus").style.color = "#28a745";
+    
+    // Habilita los controles de navegación
+    updateNavigationState();
+    
+    // Resetea al nivel original y dibuja
+    currentLevel = 0;
+    updateDisplay();
+    
+    console.log(`Raster cargado: ${rasterData.length} valores`);
+  } catch (error) {
+    console.error("Error al cargar el archivo:", error);
+    document.getElementById("fileStatus").textContent = "Error al cargar el archivo";
+    document.getElementById("fileStatus").style.color = "#dc3545";
+    isRasterLoaded = false;
+    updateNavigationState();
+  }
+}
+
+async function loadDefaultRaster() {
+  try {
+    const response = await fetch("raster.bin");
+    if (response.ok) {
+      const buffer = await response.arrayBuffer();
+      rasterData = new Int32Array(buffer);
+      isRasterLoaded = true;
+      document.getElementById("fileStatus").textContent = "Archivo por defecto: raster.bin";
+      document.getElementById("fileStatus").style.color = "#007cba";
+      updateNavigationState();
+      updateDisplay();
+    }
+  } catch (error) {
+    console.log("No se encontró raster.bin por defecto");
+    document.getElementById("fileStatus").textContent = "Selecciona un archivo .bin para comenzar";
+    document.getElementById("fileStatus").style.color = "#666";
+  }
+}
+
+function updateNavigationState() {
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  
+  if (isRasterLoaded) {
+    prevBtn.disabled = currentLevel === 0;
+    nextBtn.disabled = currentLevel === 6;
+  } else {
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+  }
 }
 
 function drawOriginalRaster() {
+  if (!isRasterLoaded) return;
+  
   const canvas = document.getElementById("rasterCanvas");
   const ctx = canvas.getContext("2d");
   const width = canvas.width;
@@ -41,6 +97,8 @@ function drawOriginalRaster() {
 }
 
 function drawRescaledRaster(level) {
+  if (!isRasterLoaded) return;
+  
   const canvas = document.getElementById("rasterCanvas");
   const ctx = canvas.getContext("2d");
   const width = canvas.width;
@@ -106,13 +164,20 @@ function drawRescaledRaster(level) {
 }
 
 function updateDisplay() {
+  if (!isRasterLoaded) {
+    // Limpia el canvas si no hay raster cargado
+    const canvas = document.getElementById("rasterCanvas");
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    return;
+  }
+  
   // Actualiza la información del nivel
   document.getElementById("levelInfo").textContent = levelInfo[currentLevel].name;
   document.getElementById("levelDetails").textContent = levelInfo[currentLevel].details;
   
   // Actualiza los botones
-  document.getElementById("prevBtn").disabled = currentLevel === 0;
-  document.getElementById("nextBtn").disabled = currentLevel === 6;
+  updateNavigationState();
   
   // Dibuja el raster correspondiente
   if (currentLevel === 0) {
@@ -123,14 +188,14 @@ function updateDisplay() {
 }
 
 function nextLevel() {
-  if (currentLevel < 6) {
+  if (isRasterLoaded && currentLevel < 6) {
     currentLevel++;
     updateDisplay();
   }
 }
 
 function prevLevel() {
-  if (currentLevel > 0) {
+  if (isRasterLoaded && currentLevel > 0) {
     currentLevel--;
     updateDisplay();
   }
@@ -140,8 +205,34 @@ function prevLevel() {
 document.getElementById("nextBtn").addEventListener("click", nextLevel);
 document.getElementById("prevBtn").addEventListener("click", prevLevel);
 
+document.getElementById("loadBtn").addEventListener("click", () => {
+  const fileInput = document.getElementById("fileInput");
+  const file = fileInput.files[0];
+  
+  if (file) {
+    if (file.name.endsWith('.bin')) {
+      loadRasterFromFile(file);
+    } else {
+      alert("Por favor selecciona un archivo .bin");
+    }
+  } else {
+    alert("Por favor selecciona un archivo");
+  }
+});
+
+document.getElementById("fileInput").addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  if (file && file.name.endsWith('.bin')) {
+    document.getElementById("loadBtn").disabled = false;
+  } else {
+    document.getElementById("loadBtn").disabled = true;
+  }
+});
+
 // Navegación con teclado
 document.addEventListener("keydown", (event) => {
+  if (!isRasterLoaded) return;
+  
   if (event.key === "ArrowLeft") {
     prevLevel();
   } else if (event.key === "ArrowRight") {
@@ -151,7 +242,8 @@ document.addEventListener("keydown", (event) => {
 
 // Inicialización
 async function init() {
-  await loadRasterData();
+  // Intenta cargar el raster por defecto si existe
+  await loadDefaultRaster();
   updateDisplay();
 }
 

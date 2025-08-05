@@ -8,14 +8,23 @@
 </head>
 <body>
   <div class="canvas-container">
-    <div class="navigation">
-      <button id="prevBtn">← Anterior</button>
-      <span id="levelInfo">Original (sin reescalado)</span>
-      <button id="nextBtn">Siguiente →</button>
+    <div class="file-upload">
+      <label for="fileInput">Seleccionar archivo .bin:</label>
+      <input type="file" id="fileInput" accept=".bin" />
+      <button id="loadBtn">Cargar Raster</button>
+      <span id="fileStatus">No hay archivo cargado</span>
     </div>
+    
+    <div class="navigation">
+      <button id="prevBtn" disabled>← Anterior</button>
+      <span id="levelInfo">Original (sin reescalado)</span>
+      <button id="nextBtn" disabled>Siguiente →</button>
+    </div>
+    
     <div class="raster-display">
       <canvas id="rasterCanvas" width="640" height="640"></canvas>
     </div>
+    
     <div class="level-indicator">
       <span id="levelDetails">Resolución: 640x640</span>
     </div>
