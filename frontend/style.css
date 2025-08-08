@@ -1,67 +1,203 @@
-.canvas-container {
-  position: relative;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  padding: 20px;
+/* Custom Purple Color Palette */
+:root {
+  --purple-dark: #2d1b69;
+  --purple-medium: #3a2472;
+  --purple-light: #4c2a85;
+  --purple-accent: #6c5ce7;
+  --purple-info: #5a4bca;
+  --purple-soft: #9b88ed;
+  --purple-text: #e2d8ff;
+  --purple-border: #574b90;
 }
 
-.navigation {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 10px;
+/* Background Colors */
+.bg-purple-dark {
+  background-color: var(--purple-dark) !important;
 }
 
-.navigation button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background: #007cba;
+.bg-purple-medium {
+  background-color: var(--purple-medium) !important;
+}
+
+.bg-purple-light {
+  background-color: var(--purple-light) !important;
+}
+
+/* Text Colors */
+.text-purple-light {
+  color: var(--purple-text) !important;
+}
+
+.text-purple-accent {
+  color: var(--purple-accent) !important;
+}
+
+/* Border Colors */
+.border-purple-light {
+  border-color: var(--purple-border) !important;
+}
+
+.border-purple-accent {
+  border-color: var(--purple-accent) !important;
+}
+
+/* Custom Button Styles */
+.btn-purple-accent {
+  background-color: var(--purple-accent);
+  border-color: var(--purple-accent);
   color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
 }
 
-.navigation button:hover {
-  background: #005a8b;
+.btn-purple-accent:hover {
+  background-color: var(--purple-soft);
+  border-color: var(--purple-soft);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(108, 92, 231, 0.3);
 }
 
-.navigation button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
+.btn-purple-accent:active {
+  background-color: var(--purple-info);
+  border-color: var(--purple-info);
+  transform: translateY(0);
 }
 
-#levelInfo {
-  font-size: 18px;
-  font-weight: bold;
-  min-width: 250px;
-  text-align: center;
+.btn-purple-accent:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
 }
 
+/* Custom Alert Styles */
+.alert-purple-info {
+  background-color: rgba(90, 75, 202, 0.2);
+  color: var(--purple-text);
+  border: 1px solid var(--purple-border);
+}
+
+/* Navbar Custom Styles */
+.navbar.bg-purple-dark {
+  background-color: var(--purple-dark) !important;
+  border-bottom: 2px solid var(--purple-accent);
+}
+
+/* Card Custom Styles */
+.card.bg-purple-medium {
+  background-color: var(--purple-medium) !important;
+  backdrop-filter: blur(10px);
+}
+
+.card.bg-purple-medium .card-body {
+  color: var(--purple-text);
+}
+
+.card.bg-purple-medium .card-title {
+  color: white !important;
+  font-weight: 600;
+}
+
+/* Canvas Styles */
 .raster-display {
   display: flex;
   justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(45, 27, 105, 0.1) 0%, rgba(108, 92, 231, 0.1) 100%);
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-canvas {
+#rasterCanvas {
   image-rendering: pixelated;
-  width: 640px;
-  height: 640px;
-  border: 5px solid #ccc;
-  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 3px solid var(--purple-border) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 8px 25px rgba(45, 27, 105, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.level-indicator {
-  text-align: center;
-  font-size: 14px;
-  color: #666;
+#rasterCanvas:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 35px rgba(45, 27, 105, 0.6);
 }
 
-#levelDetails {
-  font-style: italic;
+/* Responsive Canvas */
+@media (max-width: 768px) {
+  #rasterCanvas {
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .container-fluid {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  #rasterCanvas {
+    max-width: 350px;
+  }
+  
+  .btn-purple-accent {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  .navbar-brand {
+    font-size: 1rem;
+  }
+}
+
+/* Custom Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Shadow Enhancements */
+.shadow {
+  box-shadow: 0 4px 20px rgba(45, 27, 105, 0.3) !important;
+}
+
+.shadow-sm {
+  box-shadow: 0 2px 10px rgba(45, 27, 105, 0.2) !important;
+}
+
+/* Body Override for Dark Theme */
+body.bg-dark {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%) !important;
+  min-height: 100vh;
+  color: var(--purple-text);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--purple-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--purple-accent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--purple-soft);
 }
