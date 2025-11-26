@@ -1,0 +1,62 @@
+[
+  {
+    "fecha": "2025-08-08T10:43:21.052778",
+    "archivo": "raster.bin",
+    "build_time": "k2-raster build time: 23.966 milliseconds."
+  },
+  {
+    "fecha": "2025-08-08T10:47:47.607319",
+    "archivo": "raster.bin",
+    "build_time": "k2-raster build time: 24.744 milliseconds."
+  },
+  {
+    "fecha": "2025-08-08T11:25:04.875062",
+    "archivo": "raster.bin",
+    "build_time": "k2-raster build time: 25.313 milliseconds."
+  },
+  {
+    "fecha": "2025-08-08T11:25:09.565435",
+    "archivo": "raster.bin",
+    "build_time": "k2-raster build time: 15.443 milliseconds."
+  },
+  {
+    "fecha": "2025-08-08T11:25:15.249479",
+    "archivo": "raster.bin",
+    "build_time": "k2-raster build time: 23.898 milliseconds."
+  },
+  {
+    "fecha": "2025-08-08T11:25:17.715621",
+    "archivo": "raster.bin",
+    "build_time": "k2-raster build time: 20.561 milliseconds."
+  },
+  {
+    "fecha": "2025-08-08T11:25:49.656147",
+    "archivo": "raster.bin",
+    "build_time": "k2-raster build time: 22.875 milliseconds."
+  },
+  {
+    "fecha": "2025-08-08T11:37:20.622165",
+    "archivo": "raster.bin",
+    "build_time": "k2-raster build time: 19.111 milliseconds."
+  },
+  {
+    "fecha": "2025-08-08T12:19:47.519317",
+    "archivo": "raster.bin",
+    "build_time": "k2-raster build time: 24.236 milliseconds."
+  },
+  {
+    "fecha": "2025-08-08T12:20:05.272173",
+    "archivo": "raster.bin",
+    "build_time": "k2-raster build time: 23.53 milliseconds."
+  },
+  {
+    "fecha": "2025-08-08T12:57:47.271365",
+    "archivo": "raster.bin",
+    "build_time": "k2-raster build time: 23.914 milliseconds."
+  },
+  {
+    "fecha": "2025-08-08T13:13:21.986397",
+    "archivo": "raster.bin",
+    "build_time": "k2-raster build time: 23.252 milliseconds."
+  }
+]

@@ -7,7 +7,6 @@ echo "Download external projects"
 git submodule init
 git submodule update --init --recursive
 
-
 echo "Create folder build"
 mkdir -p build
 cd build
@@ -15,7 +14,9 @@ cd build
 echo "Run CMake"
 cmake -DCMAKE_BUILD_TYPE=Release ..
 
-echo "Run make"
-make
+NUM_CORES=$(nproc)
+
+echo "Run make with $NUM_CORES parallel jobs"
+make -j"$NUM_CORES"
 
 echo "DONE!!!"

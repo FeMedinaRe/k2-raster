@@ -1,3 +1,8 @@
 cmake-build-debug/
 .idea/
+<<<<<<< HEAD
 /build
+=======
+/build
+compile.sh
+>>>>>>> 2530776e075f3cac5438974a34d3d1906325d899

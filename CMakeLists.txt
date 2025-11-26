@@ -214,6 +214,8 @@ target_link_libraries(algebra_sc_de_k2r sdsl divsufsort divsufsort64)
 add_executable(algebra_zonal_de_k2r src/algebra/k2_raster_zonal_de.cpp ${SOURCES})
 target_link_libraries(algebra_zonal_de_k2r sdsl divsufsort divsufsort64)
 
+# HTTP Server for Frontend-Backend Communication
+
 #############
 # Utils     #
 #############

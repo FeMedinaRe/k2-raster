@@ -1,4 +1,4 @@
-k<sup>2</sup>-raster -  A compacta data strucutre for raster data
+k<sup>2</sup>-raster -  A compact data strucutre for raster data
 =========================
 
 The k<sup>2</sup>-raster is structure for representing raster datasets that uses compressed space and offers indexing capabilities, thus, improving query times over the raster data.
@@ -326,3 +326,43 @@ This project is licensed under the GNU License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgements ##
 This work was supported by European Union's Horizon 2020 research and innovation programme under the Marie Sk\l odowska-Curie [grant number 690941], Ministerio de Economía y Competitividad (PGE and FEDER) [grant numbers TIN2016-78011-C4-1-R ; TIN2016-77158-C4-3-R ; TIN2013-46238-C4-3-R ; TIN2013-46801-C4-3-R ], Centro para el desarrollo Tecnológico e Industrial [grant numbers IDI-20141259; ITC-20151247, ITC-20161074]; Xunta de Galicia (co-founded with FEDER) [grant numbers ED431C 2017/58; ED431G/01].
+
+=========================
+
+## ¿Cómo desplegar este proyecto en Docker?
+
+### 1. Software necesario para desplegar el proyecto
+
+* Git
+* Docker Engine o Docker Desktop según el sistema operativo que se utilice
+
+### 2. Clonar el repositorio
+
+* Ejecutar el siguiente comando:
+```bash
+git clone https://github.com/FeMedinaRe/k2-raster
+```
+
+### 2. ¿Cómo crear la imagen Docker?
+
+* Ingresar a la carpeta k2-raster
+```bash
+cd k2-raster
+```
+* Ejecutar el siguiente comando:
+```bash
+docker build -t k2raster .
+```
+
+### 3. Ejecutar el contenedor
+
+* Ejecutar el siguiente comando:
+```bash
+docker run -d -p 8080:80 k2raster
+```
+
+### 4. Acceder a la visualización web
+
+* Acceder a la IP del dispositivo donde se está ejecutando el contenedor y agregar el puerto asignado previamente:
+
+`localhost:8080`
